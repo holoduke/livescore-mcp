@@ -235,6 +235,10 @@ const landingHTML = `<!DOCTYPE html>
   @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
   @keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,30px)}}
   @keyframes pulse{0%,100%{opacity:0.4}50%{opacity:0.8}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
+  @keyframes floatEmoji{0%{transform:translateY(0) rotate(0deg);opacity:0.7}25%{opacity:1}50%{transform:translateY(-60px) rotate(15deg);opacity:0.7}100%{transform:translateY(-120px) rotate(-5deg);opacity:0}}
+  @keyframes gradientDivider{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
   .fade-in{opacity:0;animation:fadeInUp 0.7s ease forwards}
   .fade-in-1{animation-delay:0.1s}
   .fade-in-2{animation-delay:0.2s}
@@ -351,6 +355,44 @@ const landingHTML = `<!DOCTYPE html>
   .footer-built a{color:#64748b;text-decoration:none;font-weight:500}
   .footer-built a:hover{color:#4ade80}
 
+  /* --- Dot Grid Overlay --- */
+  .hero-dots{position:absolute;inset:0;z-index:0;background-image:radial-gradient(rgba(255,255,255,0.07) 1px,transparent 1px);background-size:32px 32px;animation:pulse 6s ease-in-out infinite}
+
+  /* --- Shimmer on Hero Stats --- */
+  .hero-stat{position:relative;overflow:hidden}
+  .hero-stat::after{content:'';position:absolute;top:0;left:-200%;width:200%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);animation:shimmer 4s ease-in-out infinite}
+
+  /* --- Floating Football Emojis --- */
+  .hero-floats{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .hero-float{position:absolute;font-size:1.5rem;animation:floatEmoji 6s ease-in-out infinite;opacity:0}
+  .hero-float:nth-child(1){left:10%;bottom:20%;animation-delay:0s;animation-duration:7s}
+  .hero-float:nth-child(2){left:80%;bottom:30%;animation-delay:2s;animation-duration:8s}
+  .hero-float:nth-child(3){left:50%;bottom:10%;animation-delay:4s;animation-duration:6s}
+  .hero-float:nth-child(4){left:25%;bottom:40%;animation-delay:1s;animation-duration:9s}
+  .hero-float:nth-child(5){left:70%;bottom:15%;animation-delay:3s;animation-duration:7.5s}
+
+  /* --- Gradient Section Titles --- */
+  .section-title{background:linear-gradient(135deg,#f1f5f9 0%,#4ade80 50%,#22d3ee 100%);background-size:200% 200%;animation:gradientShift 6s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+  /* --- Animated Gradient Dividers --- */
+  .gradient-divider{height:2px;border:none;margin:0 auto;max-width:200px;background:linear-gradient(90deg,#4ade80,#22d3ee,#a78bfa,#4ade80);background-size:300% 100%;animation:gradientDivider 4s ease infinite;border-radius:2px;opacity:0.5}
+
+  /* --- Tool Card Ring Glow --- */
+  .tool-card:hover{transform:translateY(-4px);box-shadow:0 0 0 2px rgba(74,222,128,0.15),0 12px 40px rgba(74,222,128,0.12);border-color:rgba(74,222,128,0.25)}
+
+  /* --- Live Pulse Dot --- */
+  .live-dot{display:inline-block;width:8px;height:8px;background:#4ade80;border-radius:50%;margin-right:6px;animation:livePulse 1.5s ease-in-out infinite;vertical-align:middle;box-shadow:0 0 8px rgba(74,222,128,0.6)}
+
+  /* --- Get the App Section --- */
+  .app-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:32px}
+  .app-badge{display:inline-flex;align-items:center;gap:12px;padding:14px 28px;border-radius:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);text-decoration:none;color:#e0e6ed;font-weight:600;font-size:0.9rem;transition:all 0.3s ease}
+  .app-badge:hover{transform:translateY(-3px);box-shadow:0 0 0 2px rgba(74,222,128,0.2),0 12px 32px rgba(74,222,128,0.15);border-color:rgba(74,222,128,0.3);background:rgba(255,255,255,0.08)}
+  .app-badge svg{flex-shrink:0}
+  .app-badge-text{display:flex;flex-direction:column;line-height:1.2}
+  .app-badge-small{font-size:0.65rem;font-weight:400;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em}
+  .app-badge-store{font-size:1rem;font-weight:700;color:#fff}
+  .app-tagline{text-align:center;margin-top:20px;color:#94a3b8;font-size:0.9rem;font-style:italic}
+
   /* --- Responsive --- */
   @media(max-width:768px){
     .nav-links a:not(.nav-gh){display:none}
@@ -368,6 +410,8 @@ const landingHTML = `<!DOCTYPE html>
     .hero-btns{flex-direction:column;align-items:center}
     .btn{width:100%;justify-content:center}
     .lang-pills{gap:8px}
+    .app-badges{flex-direction:column;align-items:center}
+    .app-badge{width:100%;justify-content:center}
   }
 </style>
 </head>
@@ -381,6 +425,7 @@ const landingHTML = `<!DOCTYPE html>
     <a href="#connect">Connect</a>
     <a href="#tools">Tools</a>
     <a href="#faq">FAQ</a>
+    <a href="#get-app">App</a>
     <a href="https://github.com/holoduke/livescore-mcp" class="nav-gh" target="_blank" rel="noopener">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
       GitHub
@@ -391,6 +436,14 @@ const landingHTML = `<!DOCTYPE html>
 <!-- Hero -->
 <header class="hero">
   <div class="hero-bg"></div>
+  <div class="hero-dots"></div>
+  <div class="hero-floats">
+    <span class="hero-float">&#9917;</span>
+    <span class="hero-float">&#9917;</span>
+    <span class="hero-float">&#9917;</span>
+    <span class="hero-float">&#9917;</span>
+    <span class="hero-float">&#9917;</span>
+  </div>
   <div class="hero-orb hero-orb-1"></div>
   <div class="hero-orb hero-orb-2"></div>
   <div class="hero-orb hero-orb-3"></div>
@@ -399,7 +452,7 @@ const landingHTML = `<!DOCTYPE html>
   <div class="hero-stats fade-in fade-in-3">
     <span class="hero-stat"><em>1000+</em> Leagues</span>
     <span class="hero-stat"><em>10</em> Tools</span>
-    <span class="hero-stat"><em>SSE</em> Transport</span>
+    <span class="hero-stat"><span class="live-dot"></span><em>SSE</em> Transport</span>
     <span class="hero-stat"><em>8+</em> Languages</span>
   </div>
   <div class="hero-btns fade-in fade-in-4">
@@ -437,6 +490,8 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
+  <hr class="gradient-divider">
+
   <!-- Connect -->
   <section class="section fade-in fade-in-3" id="connect">
     <span class="section-label">Setup</span>
@@ -470,6 +525,8 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
+  <hr class="gradient-divider">
+
   <!-- Tools -->
   <section class="section fade-in fade-in-3" id="tools">
     <span class="section-label">Capabilities</span>
@@ -478,7 +535,7 @@ const landingHTML = `<!DOCTYPE html>
     <div class="tools-grid">
       <article class="tool-card">
         <span class="tool-icon">&#9889;</span>
-        <h3>get_live_scores</h3>
+        <h3><span class="live-dot"></span>get_live_scores</h3>
         <p>Currently live matches with real-time scores and minute-by-minute updates from leagues worldwide</p>
       </article>
       <article class="tool-card">
@@ -529,6 +586,8 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
+  <hr class="gradient-divider">
+
   <!-- Languages -->
   <section class="section fade-in fade-in-4" id="languages">
     <span class="section-label">Global</span>
@@ -552,6 +611,8 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
+  <hr class="gradient-divider">
+
   <!-- Powered By -->
   <section class="section fade-in fade-in-4" id="powered-by">
     <span class="section-label">Data Source</span>
@@ -565,6 +626,28 @@ const landingHTML = `<!DOCTYPE html>
       </div>
     </div>
   </section>
+
+  <hr class="gradient-divider">
+
+  <!-- Get the App -->
+  <section class="section fade-in fade-in-4" id="get-app" style="text-align:center">
+    <span class="section-label">Mobile App</span>
+    <h2 class="section-title">Get the App</h2>
+    <p class="section-desc" style="margin:0 auto 8px">Download Football Mania for live scores on the go.</p>
+    <div class="app-badges">
+      <a href="https://play.google.com/store/apps/details?id=holoduke.soccer_gen&amp;hl=en_IE" class="app-badge" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3.18 1.47l8.83 8.83L3.18 19.13c-.44-.78-.18-1.76.58-2.2L3.18 1.47zM14.5 12.79l2.63 2.63-10.72 6.19c-.42.24-.93.26-1.37.08l9.46-8.9zM21.02 10.45l-3.93-2.27-2.92 2.92 2.92 2.92 3.93-2.27c.78-.45 1.06-1.45.62-2.23l-.62.93zM5.02.38l10.72 6.19-2.63 2.63L3.65.31C4.09.12 4.6.14 5.02.38z" fill="#fff"/></svg>
+        <span class="app-badge-text"><span class="app-badge-small">Get it on</span><span class="app-badge-store">Google Play</span></span>
+      </a>
+      <a href="https://apps.apple.com/us/app/football-mania-soccer-scores/id896357542" class="app-badge" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.37 2.83zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <span class="app-badge-text"><span class="app-badge-small">Download on the</span><span class="app-badge-store">App Store</span></span>
+      </a>
+    </div>
+    <p class="app-tagline">Your home for live football &mdash; powered by football-mania.com</p>
+  </section>
+
+  <hr class="gradient-divider">
 
   <!-- FAQ -->
   <section class="section fade-in fade-in-5" id="faq">
