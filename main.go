@@ -30,6 +30,11 @@ func main() {
 		port = "8080"
 	}
 
+	publicURL := os.Getenv("PUBLIC_URL")
+	if publicURL == "" {
+		publicURL = fmt.Sprintf("http://localhost:%s", port)
+	}
+
 	s := server.NewMCPServer(
 		serverName,
 		serverVersion,
@@ -41,14 +46,232 @@ func main() {
 	registerResources(s)
 
 	sseServer := server.NewSSEServer(s,
-		server.WithBaseURL(fmt.Sprintf("http://0.0.0.0:%s", port)),
+		server.WithBaseURL(publicURL),
 	)
 
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" || r.URL.Path == "" {
+			serveLandingPage(w, r)
+			return
+		}
+		sseServer.ServeHTTP(w, r)
+	})
+	mux.HandleFunc("/sse", sseServer.ServeHTTP)
+	mux.HandleFunc("/message", sseServer.ServeHTTP)
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"ok","server":"livescore-mcp","version":"1.0.0"}`))
+	})
+
 	log.Printf("LiveScore MCP Server %s starting on :%s", serverVersion, port)
-	if err := sseServer.Start(":" + port); err != nil {
+	if err := (&http.Server{Addr: ":" + port, Handler: mux}).ListenAndServe(); err != nil {
 		log.Fatalf("Server error: %v", err)
 	}
 }
+
+func serveLandingPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, landingHTML)
+}
+
+const landingHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveScore MCP - Football Live Scores via MCP</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0e17;
+    color: #e0e6ed;
+    min-height: 100vh;
+  }
+  .hero {
+    text-align: center;
+    padding: 80px 20px 60px;
+    background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 50%, #0d1a0d 100%);
+  }
+  .hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #4ade80, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    font-size: 1.25rem;
+    color: #94a3b8;
+    max-width: 600px;
+    margin: 0 auto 32px;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    color: #4ade80;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  .section { margin-bottom: 48px; }
+  .section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section h2 span { font-size: 1.5rem; }
+  .connect-box {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .connect-box h3 { color: #22d3ee; margin-bottom: 12px; font-size: 1rem; }
+  pre {
+    background: #0d1117;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #c9d1d9;
+  }
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .tool-card {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .tool-card:hover { border-color: #4ade80; }
+  .tool-card h3 {
+    font-family: monospace;
+    color: #4ade80;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+  .tool-card p { color: #94a3b8; font-size: 0.85rem; line-height: 1.5; }
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: #475569;
+    font-size: 0.85rem;
+    border-top: 1px solid #1e293b;
+  }
+  .footer a { color: #4ade80; text-decoration: none; }
+  .endpoint-url {
+    font-family: monospace;
+    background: rgba(74, 222, 128, 0.1);
+    color: #4ade80;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>LiveScore MCP</h1>
+  <p>Real-time football scores, fixtures, team &amp; player data via the Model Context Protocol</p>
+  <span class="badge">SSE Transport &bull; 10 Tools &bull; Multi-language</span>
+</div>
+
+<div class="container">
+  <div class="section">
+    <h2><span>&#9889;</span> Connect</h2>
+    <div class="connect-box">
+      <h3>SSE Endpoint</h3>
+      <p style="margin-bottom:12px">Connect any MCP client to: <span class="endpoint-url">https://livescoremcp.com/sse</span></p>
+    </div>
+    <div class="connect-box">
+      <h3>Claude Desktop / claude_desktop_config.json</h3>
+      <pre>{
+  "mcpServers": {
+    "livescore": {
+      "url": "https://livescoremcp.com/sse"
+    }
+  }
+}</pre>
+    </div>
+    <div class="connect-box">
+      <h3>Health Check</h3>
+      <pre>curl https://livescoremcp.com/health</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span>&#9917;</span> Available Tools</h2>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <h3>get_live_scores</h3>
+        <p>Currently live matches with real-time scores and minute-by-minute updates</p>
+      </div>
+      <div class="tool-card">
+        <h3>get_fixtures</h3>
+        <p>Competition fixtures &mdash; Champions League, Europa League, World Cup, etc.</p>
+      </div>
+      <div class="tool-card">
+        <h3>search</h3>
+        <p>Search teams, players, or competitions by name with optional country filter</p>
+      </div>
+      <div class="tool-card">
+        <h3>get_league_fixtures</h3>
+        <p>League-specific fixtures &mdash; Eredivisie, Premier League, La Liga, etc.</p>
+      </div>
+      <div class="tool-card">
+        <h3>get_team</h3>
+        <p>Detailed team info: squad, stats, upcoming matches, and recent results</p>
+      </div>
+      <div class="tool-card">
+        <h3>get_player</h3>
+        <p>Player profiles with career stats, current team, and transfer history</p>
+      </div>
+      <div class="tool-card">
+        <h3>get_match</h3>
+        <p>Full match details: events, lineups, stats, and head-to-head records</p>
+      </div>
+      <div class="tool-card">
+        <h3>get_day_fixtures</h3>
+        <p>All matches for a specific date across every league and competition</p>
+      </div>
+      <div class="tool-card">
+        <h3>get_team_image</h3>
+        <p>Team logo PNG URL for embedding in responses and applications</p>
+      </div>
+      <div class="tool-card">
+        <h3>health</h3>
+        <p>Connectivity check &mdash; echo back a message to verify the server is alive</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span>&#127760;</span> Languages</h2>
+    <p style="color:#94a3b8">All tools support a <code style="color:#22d3ee">language</code> parameter: <strong>en</strong>, nl, de, fr, es, pt, it, and more. Timestamps are GMT/UTC.</p>
+  </div>
+</div>
+
+<div class="footer">
+  <p>Built with <a href="https://github.com/mark3labs/mcp-go">mcp-go</a> &bull; <a href="https://github.com/holoduke/livescore-mcp">Source on GitHub</a></p>
+</div>
+</body>
+</html>`
 
 // --- Helpers ---
 
