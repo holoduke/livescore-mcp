@@ -1,0 +1,6 @@
+livescore-mcp
+*.exe
+*.log
+.idea/
+.vscode/
+.DS_Store
