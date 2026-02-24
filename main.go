@@ -63,6 +63,14 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"ok","server":"livescore-mcp","version":"1.0.0"}`))
 	})
+	mux.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		fmt.Fprint(w, robotsTxt)
+	})
+	mux.HandleFunc("/sitemap.xml", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/xml")
+		fmt.Fprint(w, sitemapXML)
+	})
 
 	log.Printf("LiveScore MCP Server %s starting on :%s", serverVersion, port)
 	if err := (&http.Server{Addr: ":" + port, Handler: mux}).ListenAndServe(); err != nil {
@@ -75,12 +83,142 @@ func serveLandingPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, landingHTML)
 }
 
+const robotsTxt = `User-agent: *
+Allow: /
+Disallow: /sse
+Disallow: /message
+Disallow: /health
+
+Sitemap: https://livescoremcp.com/sitemap.xml
+`
+
+const sitemapXML = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://livescoremcp.com/</loc>
+    <lastmod>2026-02-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+`
+
 const landingHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LiveScore MCP - Football Live Scores via MCP</title>
+
+<!-- Primary Meta Tags -->
+<title>LiveScore MCP - Football Live Scores API for AI Agents</title>
+<meta name="title" content="LiveScore MCP - Football Live Scores API for AI Agents">
+<meta name="description" content="Free MCP server for real-time football scores, fixtures, team stats and player data. Connect Claude, Cursor or any AI agent to 1000+ leagues worldwide.">
+<meta name="keywords" content="MCP server, football live scores, Model Context Protocol, AI football data, live scores API, soccer API, Claude MCP, football fixtures, SSE transport">
+<meta name="author" content="holoduke">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://livescoremcp.com/">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://livescoremcp.com/">
+<meta property="og:title" content="LiveScore MCP - Football Live Scores for AI Agents">
+<meta property="og:description" content="Free MCP server with 10 tools for real-time football scores, fixtures, team stats and player data. Works with Claude, Cursor and any MCP client.">
+<meta property="og:site_name" content="LiveScore MCP">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://livescoremcp.com/">
+<meta name="twitter:title" content="LiveScore MCP - Football Live Scores for AI Agents">
+<meta name="twitter:description" content="Free MCP server with 10 tools for real-time football scores, fixtures, team stats and player data. Works with Claude, Cursor and any MCP client.">
+
+<!-- Schema.org JSON-LD: SoftwareApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "LiveScore MCP",
+  "url": "https://livescoremcp.com",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "description": "Free MCP server providing real-time football live scores, fixtures, team statistics, player data, and match details via the Model Context Protocol. Supports 1000+ leagues worldwide with SSE transport.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "holoduke",
+    "url": "https://github.com/holoduke"
+  },
+  "softwareVersion": "1.0.0",
+  "codeRepository": "https://github.com/holoduke/livescore-mcp",
+  "programmingLanguage": "Go",
+  "keywords": ["MCP", "Model Context Protocol", "football", "live scores", "soccer", "API", "AI", "Claude", "SSE"]
+}
+</script>
+
+<!-- Schema.org JSON-LD: FAQPage -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is LiveScore MCP?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LiveScore MCP is a free Model Context Protocol (MCP) server that provides real-time football live scores, fixtures, team statistics, player data, and match details. It connects AI agents like Claude, Cursor, and other MCP-compatible clients to comprehensive football data from 1000+ leagues worldwide."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I connect to LiveScore MCP?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Connect any MCP client to the SSE endpoint at https://livescoremcp.com/sse. For Claude Desktop, add the URL to your claude_desktop_config.json under mcpServers with the key livescore and url https://livescoremcp.com/sse."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What tools does LiveScore MCP provide?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LiveScore MCP provides 10 tools: get_live_scores for real-time match scores, get_fixtures for competition fixtures, search for finding teams/players/competitions, get_league_fixtures for league-specific data, get_team for team details, get_player for player profiles, get_match for full match details with head-to-head data, get_day_fixtures for all matches on a date, get_team_image for team logos, and a health check tool."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is LiveScore MCP free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, LiveScore MCP is completely free and open source. The source code is available on GitHub at github.com/holoduke/livescore-mcp."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What languages does LiveScore MCP support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LiveScore MCP supports multiple languages including English (en), Dutch (nl), German (de), French (fr), Spanish (es), Portuguese (pt), Italian (it), and more. Use the language parameter on any tool to get results in your preferred language."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- Schema.org JSON-LD: WebSite -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "LiveScore MCP",
+  "url": "https://livescoremcp.com"
+}
+</script>
+
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -183,18 +321,37 @@ const landingHTML = `<!DOCTYPE html>
     border-radius: 4px;
     font-size: 0.9rem;
   }
+  .faq { margin-top: 48px; }
+  .faq details {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .faq summary {
+    padding: 16px 20px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #f1f5f9;
+    list-style: none;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::before { content: "+ "; color: #4ade80; font-weight: 700; margin-right: 8px; }
+  .faq details[open] summary::before { content: "- "; }
+  .faq .answer { padding: 0 20px 16px; color: #94a3b8; line-height: 1.6; font-size: 0.9rem; }
 </style>
 </head>
 <body>
-<div class="hero">
+<header class="hero">
   <h1>LiveScore MCP</h1>
   <p>Real-time football scores, fixtures, team &amp; player data via the Model Context Protocol</p>
   <span class="badge">SSE Transport &bull; 10 Tools &bull; Multi-language</span>
-</div>
+</header>
 
-<div class="container">
-  <div class="section">
-    <h2><span>&#9889;</span> Connect</h2>
+<main class="container">
+  <section class="section" id="connect">
+    <h2><span>&#9889;</span> Connect to LiveScore MCP</h2>
     <div class="connect-box">
       <h3>SSE Endpoint</h3>
       <p style="margin-bottom:12px">Connect any MCP client to: <span class="endpoint-url">https://livescoremcp.com/sse</span></p>
@@ -213,63 +370,89 @@ const landingHTML = `<!DOCTYPE html>
       <h3>Health Check</h3>
       <pre>curl https://livescoremcp.com/health</pre>
     </div>
-  </div>
+  </section>
 
-  <div class="section">
-    <h2><span>&#9917;</span> Available Tools</h2>
+  <section class="section" id="tools">
+    <h2><span>&#9917;</span> Available Football Data Tools</h2>
     <div class="tools-grid">
-      <div class="tool-card">
+      <article class="tool-card">
         <h3>get_live_scores</h3>
-        <p>Currently live matches with real-time scores and minute-by-minute updates</p>
-      </div>
-      <div class="tool-card">
+        <p>Currently live matches with real-time scores and minute-by-minute updates from leagues worldwide</p>
+      </article>
+      <article class="tool-card">
         <h3>get_fixtures</h3>
-        <p>Competition fixtures &mdash; Champions League, Europa League, World Cup, etc.</p>
-      </div>
-      <div class="tool-card">
+        <p>Competition fixtures for Champions League, Europa League, World Cup, and 1000+ tournaments</p>
+      </article>
+      <article class="tool-card">
         <h3>search</h3>
         <p>Search teams, players, or competitions by name with optional country filter</p>
-      </div>
-      <div class="tool-card">
+      </article>
+      <article class="tool-card">
         <h3>get_league_fixtures</h3>
-        <p>League-specific fixtures &mdash; Eredivisie, Premier League, La Liga, etc.</p>
-      </div>
-      <div class="tool-card">
+        <p>League-specific fixtures for Eredivisie, Premier League, La Liga, Serie A, Bundesliga and more</p>
+      </article>
+      <article class="tool-card">
         <h3>get_team</h3>
-        <p>Detailed team info: squad, stats, upcoming matches, and recent results</p>
-      </div>
-      <div class="tool-card">
+        <p>Detailed team info including squad, statistics, upcoming matches, and recent results</p>
+      </article>
+      <article class="tool-card">
         <h3>get_player</h3>
-        <p>Player profiles with career stats, current team, and transfer history</p>
-      </div>
-      <div class="tool-card">
+        <p>Player profiles with career statistics, current team, transfer history, and performance data</p>
+      </article>
+      <article class="tool-card">
         <h3>get_match</h3>
-        <p>Full match details: events, lineups, stats, and head-to-head records</p>
-      </div>
-      <div class="tool-card">
+        <p>Full match details with events, lineups, statistics, and head-to-head records</p>
+      </article>
+      <article class="tool-card">
         <h3>get_day_fixtures</h3>
-        <p>All matches for a specific date across every league and competition</p>
-      </div>
-      <div class="tool-card">
+        <p>All matches for a specific date across every league and competition worldwide</p>
+      </article>
+      <article class="tool-card">
         <h3>get_team_image</h3>
-        <p>Team logo PNG URL for embedding in responses and applications</p>
-      </div>
-      <div class="tool-card">
+        <p>Team logo PNG URL for embedding in responses and AI-powered applications</p>
+      </article>
+      <article class="tool-card">
         <h3>health</h3>
-        <p>Connectivity check &mdash; echo back a message to verify the server is alive</p>
-      </div>
+        <p>Connectivity check &mdash; echo back a message to verify the MCP server is alive</p>
+      </article>
     </div>
-  </div>
+  </section>
 
-  <div class="section">
-    <h2><span>&#127760;</span> Languages</h2>
-    <p style="color:#94a3b8">All tools support a <code style="color:#22d3ee">language</code> parameter: <strong>en</strong>, nl, de, fr, es, pt, it, and more. Timestamps are GMT/UTC.</p>
-  </div>
-</div>
+  <section class="section" id="languages">
+    <h2><span>&#127760;</span> Multi-Language Support</h2>
+    <p style="color:#94a3b8">All tools support a <code style="color:#22d3ee">language</code> parameter: <strong>en</strong> (English), <strong>nl</strong> (Dutch), <strong>de</strong> (German), <strong>fr</strong> (French), <strong>es</strong> (Spanish), <strong>pt</strong> (Portuguese), <strong>it</strong> (Italian), and more. All timestamps are in GMT/UTC.</p>
+  </section>
 
-<div class="footer">
-  <p>Built with <a href="https://github.com/mark3labs/mcp-go">mcp-go</a> &bull; <a href="https://github.com/holoduke/livescore-mcp">Source on GitHub</a></p>
-</div>
+  <section class="faq" id="faq">
+    <h2><span>&#10067;</span> Frequently Asked Questions</h2>
+    <details>
+      <summary>What is LiveScore MCP?</summary>
+      <div class="answer">LiveScore MCP is a free Model Context Protocol (MCP) server that provides real-time football live scores, fixtures, team statistics, player data, and match details. It connects AI agents like Claude, Cursor, and other MCP-compatible clients to comprehensive football data from 1000+ leagues worldwide.</div>
+    </details>
+    <details>
+      <summary>How do I connect to LiveScore MCP?</summary>
+      <div class="answer">Connect any MCP client to the SSE endpoint at <strong>https://livescoremcp.com/sse</strong>. For Claude Desktop, add the URL to your claude_desktop_config.json under mcpServers. For Cursor and other IDE-based clients, configure the SSE URL in your MCP settings.</div>
+    </details>
+    <details>
+      <summary>Is LiveScore MCP free to use?</summary>
+      <div class="answer">Yes, LiveScore MCP is completely free and open source. The source code is available on <a href="https://github.com/holoduke/livescore-mcp" style="color:#4ade80">GitHub</a>. There are no rate limits, API keys, or paid tiers.</div>
+    </details>
+    <details>
+      <summary>What leagues and competitions are supported?</summary>
+      <div class="answer">LiveScore MCP covers 1000+ football leagues and competitions worldwide, including the Premier League, La Liga, Serie A, Bundesliga, Eredivisie, Ligue 1, Champions League, Europa League, World Cup, and many more domestic and international tournaments.</div>
+    </details>
+    <details>
+      <summary>What MCP clients work with LiveScore MCP?</summary>
+      <div class="answer">LiveScore MCP uses the SSE (Server-Sent Events) transport and works with any MCP-compatible client, including Claude Desktop, Claude Code, Cursor, Windsurf, Cline, and any other tool that supports the Model Context Protocol over SSE.</div>
+    </details>
+  </section>
+</main>
+
+<footer class="footer">
+  <nav aria-label="Footer navigation">
+    <p>Built with <a href="https://github.com/mark3labs/mcp-go">mcp-go</a> &bull; <a href="https://github.com/holoduke/livescore-mcp">Source on GitHub</a></p>
+  </nav>
+</footer>
 </body>
 </html>`
 
