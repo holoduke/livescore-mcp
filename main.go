@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,6 +16,9 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )
+
+//go:embed static/*
+var staticFiles embed.FS
 
 const (
 	baseURL        = "https://uitslagen.live/footapi"
@@ -71,6 +75,7 @@ func main() {
 		w.Header().Set("Content-Type", "application/xml")
 		fmt.Fprint(w, sitemapXML)
 	})
+	mux.Handle("/static/", http.FileServer(http.FS(staticFiles)))
 	mux.HandleFunc("/privacy", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		fmt.Fprint(w, privacyHTML)
@@ -133,6 +138,7 @@ const landingHTML = `<!DOCTYPE html>
 <meta property="og:url" content="https://livescoremcp.com/">
 <meta property="og:title" content="LiveScore MCP - Football Live Scores for AI Agents">
 <meta property="og:description" content="Free MCP server with 10 tools for real-time football scores, fixtures, team stats and player data. Works with Claude, Cursor and any MCP client.">
+<meta property="og:image" content="https://livescoremcp.com/static/og-image.png">
 <meta property="og:site_name" content="LiveScore MCP">
 <meta property="og:locale" content="en_US">
 
@@ -141,6 +147,7 @@ const landingHTML = `<!DOCTYPE html>
 <meta name="twitter:url" content="https://livescoremcp.com/">
 <meta name="twitter:title" content="LiveScore MCP - Football Live Scores for AI Agents">
 <meta name="twitter:description" content="Free MCP server with 10 tools for real-time football scores, fixtures, team stats and player data. Works with Claude, Cursor and any MCP client.">
+<meta name="twitter:image" content="https://livescoremcp.com/static/og-image.png">
 
 <!-- Schema.org JSON-LD: SoftwareApplication -->
 <script type="application/ld+json">
@@ -268,7 +275,7 @@ const landingHTML = `<!DOCTYPE html>
 
   /* --- Hero --- */
   .hero{position:relative;text-align:center;padding:140px 24px 80px;overflow:hidden;min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(34,211,238,0.08) 0%,transparent 70%),radial-gradient(ellipse 60% 50% at 30% 60%,rgba(74,222,128,0.06) 0%,transparent 70%);z-index:0}
+  .hero-bg{position:absolute;inset:0;background:url('/static/hero-bg.png') center center/cover no-repeat,radial-gradient(ellipse 80% 60% at 50% 40%,rgba(34,211,238,0.08) 0%,transparent 70%),radial-gradient(ellipse 60% 50% at 30% 60%,rgba(74,222,128,0.06) 0%,transparent 70%);z-index:0;opacity:0.4}
   .hero-orb{position:absolute;border-radius:50%;filter:blur(80px);z-index:0}
   .hero-orb-1{width:400px;height:400px;background:rgba(74,222,128,0.12);top:-100px;left:-100px;animation:float 8s ease-in-out infinite}
   .hero-orb-2{width:350px;height:350px;background:rgba(34,211,238,0.10);bottom:-80px;right:-80px;animation:float2 10s ease-in-out infinite}
@@ -319,7 +326,9 @@ const landingHTML = `<!DOCTYPE html>
   .endpoint-url{font-family:'SF Mono',Consolas,monospace;background:rgba(74,222,128,0.1);color:#4ade80;padding:3px 10px;border-radius:6px;font-size:0.85rem;font-weight:600}
 
   /* --- Tools --- */
-  .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:32px}
+  .tools-section{position:relative}
+  .tools-section::before{content:'';position:absolute;inset:0;background:url('/static/tools-bg.png') center center/cover no-repeat;opacity:0.06;z-index:0;pointer-events:none;border-radius:20px}
+  .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:32px;position:relative;z-index:1}
   .tool-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-left:3px solid;border-image:linear-gradient(180deg,#4ade80,#22d3ee) 1;border-radius:14px;padding:24px;transition:all 0.3s ease;cursor:default}
   .tool-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.15)}
   .tool-icon{font-size:1.5rem;margin-bottom:12px;display:block}
@@ -550,7 +559,7 @@ const landingHTML = `<!DOCTYPE html>
   <hr class="gradient-divider">
 
   <!-- Tools -->
-  <section class="section fade-in fade-in-3" id="tools">
+  <section class="section fade-in fade-in-3 tools-section" id="tools">
     <span class="section-label">Capabilities</span>
     <h2 class="section-title">Available Football Data Tools</h2>
     <p class="section-desc">10 powerful tools to access real-time football data from leagues worldwide.</p>
