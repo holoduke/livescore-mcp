@@ -71,6 +71,10 @@ func main() {
 		w.Header().Set("Content-Type", "application/xml")
 		fmt.Fprint(w, sitemapXML)
 	})
+	mux.HandleFunc("/privacy", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		fmt.Fprint(w, privacyHTML)
+	})
 
 	log.Printf("LiveScore MCP Server %s starting on :%s", serverVersion, port)
 	if err := (&http.Server{Addr: ":" + port, Handler: mux}).ListenAndServe(); err != nil {
@@ -99,6 +103,12 @@ const sitemapXML = `<?xml version="1.0" encoding="UTF-8"?>
     <lastmod>2026-02-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://livescoremcp.com/privacy</loc>
+    <lastmod>2026-02-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>
 `
@@ -194,7 +204,7 @@ const landingHTML = `<!DOCTYPE html>
       "name": "Is LiveScore MCP free to use?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, LiveScore MCP is completely free and open source. The source code is available on GitHub at github.com/holoduke/livescore-mcp."
+        "text": "Yes, LiveScore MCP is free for personal and non-commercial use. The source code is available on GitHub at github.com/holoduke/livescore-mcp. Rate limits apply. For commercial use or higher rate limits, contact gillis.haasnoot@gmail.com."
       }
     },
     {
@@ -392,6 +402,18 @@ const landingHTML = `<!DOCTYPE html>
   .app-badge-small{font-size:0.65rem;font-weight:400;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em}
   .app-badge-store{font-size:1rem;font-weight:700;color:#fff}
   .app-tagline{text-align:center;margin-top:20px;color:#94a3b8;font-size:0.9rem;font-style:italic}
+
+  /* --- Usage Policy --- */
+  .policy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:32px}
+  .policy-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:24px;transition:border-color 0.3s}
+  .policy-card:hover{border-color:rgba(255,255,255,0.12)}
+  .policy-icon{font-size:1.5rem;margin-bottom:12px;display:block}
+  .policy-card h3{font-size:0.95rem;font-weight:700;color:#f1f5f9;margin-bottom:8px}
+  .policy-card p{color:#94a3b8;font-size:0.85rem;line-height:1.7}
+  .policy-card a{color:#4ade80;text-decoration:none;font-weight:600}
+  .policy-card a:hover{text-decoration:underline}
+  .policy-note{margin-top:24px;padding:20px 24px;background:rgba(234,179,8,0.06);border:1px solid rgba(234,179,8,0.15);border-radius:12px;color:#94a3b8;font-size:0.85rem;line-height:1.7}
+  .policy-note strong{color:#eab308}
 
   /* --- Responsive --- */
   @media(max-width:768px){
@@ -649,6 +671,35 @@ const landingHTML = `<!DOCTYPE html>
 
   <hr class="gradient-divider">
 
+  <!-- Usage Policy -->
+  <section class="section fade-in fade-in-4" id="usage-policy">
+    <span class="section-label">Fair Use</span>
+    <h2 class="section-title">Usage Policy</h2>
+    <p class="section-desc">LiveScore MCP is free for personal and non-commercial use. Please respect the following guidelines.</p>
+    <div class="policy-grid">
+      <div class="policy-card">
+        <span class="policy-icon">&#9889;</span>
+        <h3>Rate Limits Apply</h3>
+        <p>To ensure fair access for everyone, rate limits are enforced. Excessive or automated bulk requests may be throttled or blocked.</p>
+      </div>
+      <div class="policy-card">
+        <span class="policy-icon">&#128188;</span>
+        <h3>Commercial Use</h3>
+        <p>Using LiveScore MCP data in commercial products, paid services, or for-profit applications requires a commercial license. Contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a> for details.</p>
+      </div>
+      <div class="policy-card">
+        <span class="policy-icon">&#128156;</span>
+        <h3>Be Respectful</h3>
+        <p>Do not abuse the service, scrape data aggressively, or use it in ways that degrade the experience for others. Keep it fair and friendly.</p>
+      </div>
+    </div>
+    <div class="policy-note">
+      <strong>&#9888; Note:</strong> Abuse of the service &mdash; including excessive requests, data scraping, or circumventing rate limits &mdash; may result in your access being permanently revoked. For commercial inquiries or higher rate limits, reach out to <a href="mailto:gillis.haasnoot@gmail.com" style="color:#eab308;text-decoration:none;font-weight:600">gillis.haasnoot@gmail.com</a>.
+    </div>
+  </section>
+
+  <hr class="gradient-divider">
+
   <!-- FAQ -->
   <section class="section fade-in fade-in-5" id="faq">
     <span class="section-label">Support</span>
@@ -664,7 +715,7 @@ const landingHTML = `<!DOCTYPE html>
       </details>
       <details class="faq-item">
         <summary>Is LiveScore MCP free to use?</summary>
-        <div class="faq-answer">Yes, LiveScore MCP is completely free and open source. The source code is available on <a href="https://github.com/holoduke/livescore-mcp">GitHub</a>. There are no rate limits, API keys, or paid tiers.</div>
+        <div class="faq-answer">Yes, LiveScore MCP is free for personal and non-commercial use. The source code is available on <a href="https://github.com/holoduke/livescore-mcp">GitHub</a>. Rate limits apply to ensure fair access for all users. For commercial use or higher rate limits, please contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</div>
       </details>
       <details class="faq-item">
         <summary>What leagues and competitions are supported?</summary>
@@ -687,9 +738,104 @@ const landingHTML = `<!DOCTYPE html>
       <a href="#connect">Get Started</a>
       <a href="#tools">Tools</a>
       <a href="#faq">FAQ</a>
+      <a href="/privacy">Privacy Policy</a>
     </div>
     <div class="footer-built">Powered by <a href="https://football-mania.com">football-mania.com</a> &bull; Built with <a href="https://github.com/mark3labs/mcp-go">mcp-go</a> &bull; <a href="https://github.com/holoduke/livescore-mcp">Source on GitHub</a></div>
   </div>
+</footer>
+</body>
+</html>`
+
+const privacyHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy - LiveScore MCP</title>
+<meta name="description" content="Privacy Policy for LiveScore MCP - Football Live Scores API for AI Agents">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://livescoremcp.com/privacy">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#06080f;color:#e0e6ed;min-height:100vh}
+  .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,8,15,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06)}
+  .nav-logo{font-weight:800;font-size:1.1rem;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px}
+  .nav-logo span{font-size:1.2rem}
+  .container{max-width:720px;margin:0 auto;padding:100px 24px 64px}
+  h1{font-size:clamp(1.8rem,4vw,2.4rem);font-weight:900;margin-bottom:8px;background:linear-gradient(135deg,#f1f5f9 0%,#4ade80 50%,#22d3ee 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .updated{color:#64748b;font-size:0.85rem;margin-bottom:40px}
+  h2{font-size:1.2rem;font-weight:700;color:#f1f5f9;margin:36px 0 12px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06)}
+  h2:first-of-type{border-top:none;margin-top:0}
+  p,li{color:#94a3b8;font-size:0.92rem;line-height:1.8;margin-bottom:12px}
+  ul{padding-left:20px;margin-bottom:16px}
+  a{color:#4ade80;text-decoration:none;font-weight:500}
+  a:hover{text-decoration:underline}
+  .back{display:inline-flex;align-items:center;gap:6px;margin-top:40px;color:#4ade80;font-weight:600;font-size:0.9rem}
+  .footer{border-top:1px solid rgba(255,255,255,0.06);padding:32px 24px;text-align:center;color:#475569;font-size:0.82rem;margin-top:32px}
+  .footer a{color:#64748b;font-weight:500}
+  .footer a:hover{color:#4ade80}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="nav-logo"><span>&#9917;</span> LiveScore MCP</a>
+</nav>
+<div class="container">
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: February 24, 2026</p>
+
+  <h2>Overview</h2>
+  <p>LiveScore MCP ("the Service") is a free Model Context Protocol server providing real-time football data. This Privacy Policy explains what data we collect, how we use it, and your rights.</p>
+
+  <h2>Data We Collect</h2>
+  <p>When you use the Service, we may collect:</p>
+  <ul>
+    <li><strong>Request metadata:</strong> IP address, timestamp, user agent, and requested endpoint. This is standard server logging.</li>
+    <li><strong>Query parameters:</strong> Language preferences and search terms sent to the API. These are not linked to personal identifiers.</li>
+  </ul>
+  <p>We do <strong>not</strong> collect personal information, account credentials, cookies, or tracking identifiers. There are no user accounts or sign-ups.</p>
+
+  <h2>How We Use Your Data</h2>
+  <p>Collected data is used exclusively to:</p>
+  <ul>
+    <li>Operate and maintain the Service</li>
+    <li>Monitor for abuse and enforce rate limits</li>
+    <li>Diagnose technical issues and improve reliability</li>
+  </ul>
+
+  <h2>Data Sharing</h2>
+  <p>We do not sell, rent, or share your data with third parties. Server logs may be stored on our hosting infrastructure (Hetzner, Germany) and are subject to their data processing policies.</p>
+
+  <h2>Data Retention</h2>
+  <p>Server logs are retained for a maximum of 30 days and then automatically deleted. No long-term personal data storage takes place.</p>
+
+  <h2>Third-Party Services</h2>
+  <p>The landing page uses Google Fonts for typography. Google may collect basic usage data when fonts are loaded. The football data is sourced from <a href="https://football-mania.com" target="_blank" rel="noopener">football-mania.com</a>. No other third-party analytics or tracking services are used.</p>
+
+  <h2>Rate Limits &amp; Fair Use</h2>
+  <p>Rate limits are enforced to ensure fair access. Excessive or automated bulk requests may be throttled or blocked based on IP address. For commercial use or higher rate limits, contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
+
+  <h2>Your Rights</h2>
+  <p>Since we do not collect personal data beyond standard server logs, there is generally no personal data to access, correct, or delete. If you have concerns about data associated with your IP address, contact us and we will address your request.</p>
+
+  <h2>Children</h2>
+  <p>The Service is not directed at children under 16. We do not knowingly collect data from minors.</p>
+
+  <h2>Changes to This Policy</h2>
+  <p>We may update this policy from time to time. Changes will be reflected on this page with an updated date.</p>
+
+  <h2>Contact</h2>
+  <p>For privacy questions, commercial licensing, or any other inquiries:</p>
+  <p><a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a></p>
+
+  <a href="/" class="back">&larr; Back to LiveScore MCP</a>
+</div>
+<footer class="footer">
+  Powered by <a href="https://football-mania.com">football-mania.com</a> &bull; <a href="https://github.com/holoduke/livescore-mcp">Source on GitHub</a>
 </footer>
 </body>
 </html>`
