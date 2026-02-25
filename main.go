@@ -254,7 +254,6 @@ const landingHTML = `<!DOCTYPE html>
   @keyframes pulse{0%,100%{opacity:0.4}50%{opacity:0.8}}
   @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
   @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
-  @keyframes floatEmoji{0%{transform:translateY(0) rotate(0deg);opacity:0.7}25%{opacity:1}50%{transform:translateY(-60px) rotate(15deg);opacity:0.7}100%{transform:translateY(-120px) rotate(-5deg);opacity:0}}
   @keyframes gradientDivider{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
   .fade-in{opacity:0;animation:fadeInUp 0.7s ease forwards}
   .fade-in-1{animation-delay:0.1s}
@@ -266,7 +265,7 @@ const landingHTML = `<!DOCTYPE html>
   /* --- Sticky Nav --- */
   .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,8,15,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s}
   .nav-logo{font-weight:800;font-size:1.1rem;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px}
-  .nav-logo span{font-size:1.2rem}
+  .nav-logo svg{flex-shrink:0}
   .nav-links{display:flex;align-items:center;gap:24px}
   .nav-links a{color:#94a3b8;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.2s}
   .nav-links a:hover{color:#fff}
@@ -275,13 +274,14 @@ const landingHTML = `<!DOCTYPE html>
 
   /* --- Hero --- */
   .hero{position:relative;text-align:center;padding:140px 24px 80px;overflow:hidden;min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .hero-bg{position:absolute;inset:0;background:url('/static/hero-bg.png') center center/cover no-repeat,radial-gradient(ellipse 80% 60% at 50% 40%,rgba(34,211,238,0.08) 0%,transparent 70%),radial-gradient(ellipse 60% 50% at 30% 60%,rgba(74,222,128,0.06) 0%,transparent 70%);z-index:0;opacity:0.4}
+  .hero-bg{position:absolute;inset:0;background:url('/static/hero-bg.png') center center/cover no-repeat;z-index:0;opacity:0.25}
+  .hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,15,0.5) 0%,rgba(6,8,15,0.2) 40%,rgba(6,8,15,0.7) 100%)}
   .hero-orb{position:absolute;border-radius:50%;filter:blur(80px);z-index:0}
   .hero-orb-1{width:400px;height:400px;background:rgba(74,222,128,0.12);top:-100px;left:-100px;animation:float 8s ease-in-out infinite}
   .hero-orb-2{width:350px;height:350px;background:rgba(34,211,238,0.10);bottom:-80px;right:-80px;animation:float2 10s ease-in-out infinite}
   .hero-orb-3{width:200px;height:200px;background:rgba(168,85,247,0.08);top:50%;left:60%;animation:float 12s ease-in-out infinite,pulse 4s ease-in-out infinite}
   .hero *:not(.hero-bg):not(.hero-orb){position:relative;z-index:1}
-  .hero h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:900;letter-spacing:-0.03em;line-height:1.1;margin-bottom:20px;background:linear-gradient(135deg,#4ade80 0%,#22d3ee 50%,#a78bfa 100%);background-size:200% 200%;animation:gradientShift 6s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .hero h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:900;letter-spacing:-0.03em;line-height:1.1;margin-bottom:20px;background:linear-gradient(135deg,#4ade80 0%,#22d3ee 50%,#a78bfa 100%);background-size:200% 200%;animation:gradientShift 6s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 2px 8px rgba(74,222,128,0.3))}
   .hero-sub{font-size:clamp(1rem,2.5vw,1.3rem);color:#94a3b8;max-width:560px;margin:0 auto 32px;line-height:1.6;font-weight:400}
   .hero-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:36px}
   .hero-stat{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:8px 18px;border-radius:100px;font-size:0.85rem;font-weight:600;color:#cbd5e1}
@@ -374,21 +374,9 @@ const landingHTML = `<!DOCTYPE html>
   .footer-built a{color:#64748b;text-decoration:none;font-weight:500}
   .footer-built a:hover{color:#4ade80}
 
-  /* --- Dot Grid Overlay --- */
-  .hero-dots{position:absolute;inset:0;z-index:0;background-image:radial-gradient(rgba(255,255,255,0.07) 1px,transparent 1px);background-size:32px 32px;animation:pulse 6s ease-in-out infinite}
-
   /* --- Shimmer on Hero Stats --- */
   .hero-stat{position:relative;overflow:hidden}
   .hero-stat::after{content:'';position:absolute;top:0;left:-200%;width:200%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);animation:shimmer 4s ease-in-out infinite}
-
-  /* --- Floating Football Emojis --- */
-  .hero-floats{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-  .hero-float{position:absolute;font-size:1.5rem;animation:floatEmoji 6s ease-in-out infinite;opacity:0}
-  .hero-float:nth-child(1){left:10%;bottom:20%;animation-delay:0s;animation-duration:7s}
-  .hero-float:nth-child(2){left:80%;bottom:30%;animation-delay:2s;animation-duration:8s}
-  .hero-float:nth-child(3){left:50%;bottom:10%;animation-delay:4s;animation-duration:6s}
-  .hero-float:nth-child(4){left:25%;bottom:40%;animation-delay:1s;animation-duration:9s}
-  .hero-float:nth-child(5){left:70%;bottom:15%;animation-delay:3s;animation-duration:7.5s}
 
   /* --- Gradient Section Titles --- */
   .section-title{background:linear-gradient(135deg,#f1f5f9 0%,#4ade80 50%,#22d3ee 100%);background-size:200% 200%;animation:gradientShift 6s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -412,6 +400,18 @@ const landingHTML = `<!DOCTYPE html>
   .app-badge-store{font-size:1rem;font-weight:700;color:#fff}
   .app-tagline{text-align:center;margin-top:20px;color:#94a3b8;font-size:0.9rem;font-style:italic}
 
+  /* --- Examples Chat Bubbles --- */
+  .examples-grid{display:grid;gap:32px;margin-top:32px}
+  .example-item{display:flex;flex-direction:column;gap:12px}
+  .chat-q,.chat-a{max-width:85%;padding:16px 20px;border-radius:16px;font-size:0.88rem;line-height:1.6;position:relative}
+  .chat-q{align-self:flex-end;background:linear-gradient(135deg,rgba(74,222,128,0.15),rgba(34,211,238,0.15));border:1px solid rgba(74,222,128,0.2);color:#e0e6ed;border-bottom-right-radius:4px}
+  .chat-q::before{content:'You';position:absolute;top:-20px;right:0;font-size:0.7rem;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:0.05em}
+  .chat-a{align-self:flex-start;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;border-bottom-left-radius:4px}
+  .chat-a::before{content:'LiveScore MCP';position:absolute;top:-20px;left:0;font-size:0.7rem;font-weight:600;color:#22d3ee;text-transform:uppercase;letter-spacing:0.05em}
+  .chat-a strong{color:#4ade80;font-weight:700}
+  .chat-a .score{font-family:'SF Mono',Consolas,monospace;color:#22d3ee;font-weight:600}
+  @media(max-width:480px){.chat-q,.chat-a{max-width:95%;font-size:0.82rem;padding:14px 16px}}
+
   /* --- Usage Policy --- */
   .policy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:32px}
   .policy-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:24px;transition:border-color 0.3s}
@@ -429,20 +429,32 @@ const landingHTML = `<!DOCTYPE html>
     .nav-links a:not(.nav-gh){display:none}
     .steps{grid-template-columns:1fr;gap:24px}
     .steps::before{display:none}
-    .hero{padding:120px 20px 60px;min-height:auto}
+    .hero{padding:110px 20px 50px;min-height:auto}
     .hero-stats{gap:8px}
     .hero-stat{padding:6px 14px;font-size:0.8rem}
     .tools-grid{grid-template-columns:1fr}
     .footer-inner{flex-direction:column;text-align:center}
-    .footer-links{justify-content:center}
+    .footer-links{justify-content:center;flex-wrap:wrap}
+    .section{padding:48px 0}
+    .connect-box{padding:20px}
+    pre{font-size:0.72rem;padding:16px}
+    .policy-grid{grid-template-columns:1fr}
+    .policy-note{padding:16px}
+    .footer-built{text-align:center;font-size:0.75rem}
   }
   @media(max-width:480px){
     .hero h1{font-size:2rem}
+    .hero-sub{font-size:0.95rem;margin-bottom:24px}
     .hero-btns{flex-direction:column;align-items:center}
     .btn{width:100%;justify-content:center}
     .lang-pills{gap:8px}
     .app-badges{flex-direction:column;align-items:center}
     .app-badge{width:100%;justify-content:center}
+    .hero-stats{flex-direction:column;align-items:center;gap:6px}
+    .hero-stat{width:auto}
+    .container{padding:0 16px}
+    .nav{padding:0 16px}
+    .footer{padding:32px 16px}
   }
 </style>
 </head>
@@ -450,9 +462,10 @@ const landingHTML = `<!DOCTYPE html>
 
 <!-- Nav -->
 <nav class="nav">
-  <a href="#" class="nav-logo"><span>&#9917;</span> LiveScore MCP</a>
+  <a href="#" class="nav-logo"><svg width="24" height="21" viewBox="0 0 159.83 139.7" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M121.35,34.77c-1.38-1.63-3.4-2.57-5.52-2.57h-60.88c-3.39,0-6.3,2.42-6.91,5.75l-11.16,61.01c-.38,2.1.19,4.25,1.57,5.9,1.39,1.66,3.41,2.62,5.56,2.62h61.97c3.46,0,6.37-2.47,6.93-5.87l10.07-61.01c.34-2.08-.25-4.21-1.63-5.83ZM68.74,42.53c5.65-.23,11.13.79,16.34,3.03,5.21,2.24,9.73,5.53,13.44,9.77l.95,1.08-17.51-3.83-14.66-10,1.44-.06ZM57.38,82.64l-.26-.13v-.29c-.12-7.38.16-12.31,1.12-19.57l.04-.32.32-.08c7.55-1.82,12.74-2.71,20.57-3.54l.27-.03.16.21c4.78,6.25,7.7,10.63,11.59,17.36l.16.28-.21.25c-4.6,5.68-7.98,9.29-13.42,14.28l-.21.19-.27-.1c-7.62-2.74-12.63-4.89-19.87-8.54ZM46.86,49.79c4.27-3.22,9.27-5.53,14.84-6.52l-.03.36c-2.03.59-3.97,1.37-5.83,2.3l-5.56,12.35-5.64,3.71,2.23-12.19ZM37.83,99.13l2.43-13.28,5.92,4.34,2.32,16.31h-4.5c-3.89,0-6.87-3.56-6.17-7.37ZM99.23,106.5h-23.11l5.03-4.72,13.13,2.52c1.67-1.54,3.21-3.27,4.57-5.2,1.33-1.84,2.46-3.8,3.42-5.83l-2.45-13.71,5.41-13.23.42,1.17c.22.61.38,1.23.56,1.84,4.6,12.1,1.81,26.93-6.98,37.15Z" fill="#fff"/></svg> LiveScore MCP</a>
   <div class="nav-links">
     <a href="#how-it-works">How It Works</a>
+    <a href="#examples">Examples</a>
     <a href="#connect">Connect</a>
     <a href="#tools">Tools</a>
     <a href="#faq">FAQ</a>
@@ -467,14 +480,6 @@ const landingHTML = `<!DOCTYPE html>
 <!-- Hero -->
 <header class="hero">
   <div class="hero-bg"></div>
-  <div class="hero-dots"></div>
-  <div class="hero-floats">
-    <span class="hero-float">&#9917;</span>
-    <span class="hero-float">&#9917;</span>
-    <span class="hero-float">&#9917;</span>
-    <span class="hero-float">&#9917;</span>
-    <span class="hero-float">&#9917;</span>
-  </div>
   <div class="hero-orb hero-orb-1"></div>
   <div class="hero-orb hero-orb-2"></div>
   <div class="hero-orb hero-orb-3"></div>
@@ -517,6 +522,29 @@ const landingHTML = `<!DOCTYPE html>
         <div class="step-num">3</div>
         <h3>Query Live Data</h3>
         <p>Ask your AI for live scores, fixtures, team stats, player profiles, and more</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="gradient-divider">
+
+  <!-- Examples -->
+  <section class="section fade-in fade-in-3" id="examples">
+    <span class="section-label">In Action</span>
+    <h2 class="section-title">Example Queries</h2>
+    <p class="section-desc">See what you can ask your AI agent when connected to LiveScore MCP.</p>
+    <div class="examples-grid">
+      <div class="example-item">
+        <div class="chat-q">What are the live scores right now?</div>
+        <div class="chat-a"><strong>Premier League</strong><br>Arsenal <span class="score">2 - 1</span> Chelsea &bull; 67'<br>Liverpool <span class="score">0 - 0</span> Man City &bull; 34'<br><br><strong>La Liga</strong><br>Real Madrid <span class="score">3 - 0</span> Getafe &bull; FT<br><em style="color:#64748b;font-size:0.8rem">Showing 3 of 12 live matches</em></div>
+      </div>
+      <div class="example-item">
+        <div class="chat-q">Search for Feyenoord and show me their squad</div>
+        <div class="chat-a"><strong>Feyenoord Rotterdam</strong> &bull; Eredivisie<br>Stadium: De Kuip (47,000)<br>Coach: Brian Priske<br><br><strong>Key Players:</strong><br>Santiago Gimenez &bull; Forward &bull; #29<br>Igor Paixao &bull; Winger &bull; #11<br>Justin Bijlow &bull; Goalkeeper &bull; #1<br><em style="color:#64748b;font-size:0.8rem">+ 22 more players</em></div>
+      </div>
+      <div class="example-item">
+        <div class="chat-q">Get me all Champions League fixtures</div>
+        <div class="chat-a"><strong>UEFA Champions League 2025/26</strong><br><br>Round of 16 &bull; 1st Leg:<br>Barcelona <span class="score">vs</span> PSG &bull; Mar 4<br>Bayern Munich <span class="score">vs</span> Inter Milan &bull; Mar 4<br>Real Madrid <span class="score">vs</span> Man City &bull; Mar 5<br>Liverpool <span class="score">vs</span> Juventus &bull; Mar 5<br><em style="color:#64748b;font-size:0.8rem">+ 4 more fixtures</em></div>
       </div>
     </div>
   </section>
@@ -773,7 +801,7 @@ const privacyHTML = `<!DOCTYPE html>
   body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#06080f;color:#e0e6ed;min-height:100vh}
   .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,8,15,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06)}
   .nav-logo{font-weight:800;font-size:1.1rem;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px}
-  .nav-logo span{font-size:1.2rem}
+  .nav-logo svg{flex-shrink:0}
   .container{max-width:720px;margin:0 auto;padding:100px 24px 64px}
   h1{font-size:clamp(1.8rem,4vw,2.4rem);font-weight:900;margin-bottom:8px;background:linear-gradient(135deg,#f1f5f9 0%,#4ade80 50%,#22d3ee 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
   .updated{color:#64748b;font-size:0.85rem;margin-bottom:40px}
@@ -791,7 +819,7 @@ const privacyHTML = `<!DOCTYPE html>
 </head>
 <body>
 <nav class="nav">
-  <a href="/" class="nav-logo"><span>&#9917;</span> LiveScore MCP</a>
+  <a href="/" class="nav-logo"><svg width="24" height="21" viewBox="0 0 159.83 139.7" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M121.35,34.77c-1.38-1.63-3.4-2.57-5.52-2.57h-60.88c-3.39,0-6.3,2.42-6.91,5.75l-11.16,61.01c-.38,2.1.19,4.25,1.57,5.9,1.39,1.66,3.41,2.62,5.56,2.62h61.97c3.46,0,6.37-2.47,6.93-5.87l10.07-61.01c.34-2.08-.25-4.21-1.63-5.83ZM68.74,42.53c5.65-.23,11.13.79,16.34,3.03,5.21,2.24,9.73,5.53,13.44,9.77l.95,1.08-17.51-3.83-14.66-10,1.44-.06ZM57.38,82.64l-.26-.13v-.29c-.12-7.38.16-12.31,1.12-19.57l.04-.32.32-.08c7.55-1.82,12.74-2.71,20.57-3.54l.27-.03.16.21c4.78,6.25,7.7,10.63,11.59,17.36l.16.28-.21.25c-4.6,5.68-7.98,9.29-13.42,14.28l-.21.19-.27-.1c-7.62-2.74-12.63-4.89-19.87-8.54ZM46.86,49.79c4.27-3.22,9.27-5.53,14.84-6.52l-.03.36c-2.03.59-3.97,1.37-5.83,2.3l-5.56,12.35-5.64,3.71,2.23-12.19ZM37.83,99.13l2.43-13.28,5.92,4.34,2.32,16.31h-4.5c-3.89,0-6.87-3.56-6.17-7.37ZM99.23,106.5h-23.11l5.03-4.72,13.13,2.52c1.67-1.54,3.21-3.27,4.57-5.2,1.33-1.84,2.46-3.8,3.42-5.83l-2.45-13.71,5.41-13.23.42,1.17c.22.61.38,1.23.56,1.84,4.6,12.1,1.81,26.93-6.98,37.15Z" fill="#fff"/></svg> LiveScore MCP</a>
 </nav>
 <div class="container">
   <h1>Privacy Policy</h1>
