@@ -401,16 +401,16 @@ const landingHTML = `<!DOCTYPE html>
   .app-tagline{text-align:center;margin-top:20px;color:#94a3b8;font-size:0.9rem;font-style:italic}
 
   /* --- Examples Chat Bubbles --- */
-  .examples-grid{display:grid;gap:32px;margin-top:32px}
-  .example-item{display:flex;flex-direction:column;gap:12px}
-  .chat-q,.chat-a{max-width:85%;padding:16px 20px;border-radius:16px;font-size:0.88rem;line-height:1.6;position:relative}
-  .chat-q{align-self:flex-end;background:linear-gradient(135deg,rgba(74,222,128,0.15),rgba(34,211,238,0.15));border:1px solid rgba(74,222,128,0.2);color:#e0e6ed;border-bottom-right-radius:4px}
-  .chat-q::before{content:'You';position:absolute;top:-20px;right:0;font-size:0.7rem;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:0.05em}
-  .chat-a{align-self:flex-start;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;border-bottom-left-radius:4px}
+  .examples-grid{display:grid;gap:40px;margin-top:32px}
+  .example-item{display:grid;grid-template-columns:1fr 1.4fr;gap:16px;align-items:start}
+  .chat-q,.chat-a{padding:16px 20px;border-radius:16px;font-size:0.88rem;line-height:1.6;position:relative;margin-top:24px}
+  .chat-q{background:linear-gradient(135deg,rgba(74,222,128,0.12),rgba(34,211,238,0.12));border:1px solid rgba(74,222,128,0.2);color:#e0e6ed;border-top-left-radius:4px}
+  .chat-q::before{content:'You';position:absolute;top:-20px;left:0;font-size:0.7rem;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:0.05em}
+  .chat-a{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;border-top-right-radius:4px}
   .chat-a::before{content:'LiveScore MCP';position:absolute;top:-20px;left:0;font-size:0.7rem;font-weight:600;color:#22d3ee;text-transform:uppercase;letter-spacing:0.05em}
   .chat-a strong{color:#4ade80;font-weight:700}
   .chat-a .score{font-family:'SF Mono',Consolas,monospace;color:#22d3ee;font-weight:600}
-  @media(max-width:480px){.chat-q,.chat-a{max-width:95%;font-size:0.82rem;padding:14px 16px}}
+  @media(max-width:640px){.example-item{grid-template-columns:1fr}.chat-q,.chat-a{font-size:0.82rem;padding:14px 16px}}
 
   /* --- Usage Policy --- */
   .policy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:32px}
