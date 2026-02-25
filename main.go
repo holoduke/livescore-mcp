@@ -7,14 +7,17 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"golang.org/x/time/rate"
 )
 
 //go:embed static/*
@@ -53,6 +56,9 @@ func main() {
 		server.WithBaseURL(publicURL),
 	)
 
+	// 30 requests/min per IP, burst of 10
+	rl := newRateLimiter(rate.Every(2*time.Second), 10)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" || r.URL.Path == "" {
@@ -62,7 +68,7 @@ func main() {
 		sseServer.ServeHTTP(w, r)
 	})
 	mux.HandleFunc("/sse", sseServer.ServeHTTP)
-	mux.HandleFunc("/message", sseServer.ServeHTTP)
+	mux.HandleFunc("/message", rl.middleware(sseServer.ServeHTTP))
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"ok","server":"livescore-mcp","version":"1.0.0"}`))
@@ -90,6 +96,80 @@ func main() {
 func serveLandingPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, landingHTML)
+}
+
+// --- Rate Limiter ---
+
+type ipLimiter struct {
+	limiter  *rate.Limiter
+	lastSeen time.Time
+}
+
+type rateLimiter struct {
+	mu       sync.Mutex
+	visitors map[string]*ipLimiter
+	rate     rate.Limit
+	burst    int
+}
+
+func newRateLimiter(r rate.Limit, burst int) *rateLimiter {
+	rl := &rateLimiter{
+		visitors: make(map[string]*ipLimiter),
+		rate:     r,
+		burst:    burst,
+	}
+	go rl.cleanup()
+	return rl
+}
+
+func (rl *rateLimiter) getLimiter(ip string) *rate.Limiter {
+	rl.mu.Lock()
+	defer rl.mu.Unlock()
+
+	v, exists := rl.visitors[ip]
+	if !exists {
+		limiter := rate.NewLimiter(rl.rate, rl.burst)
+		rl.visitors[ip] = &ipLimiter{limiter: limiter, lastSeen: time.Now()}
+		return limiter
+	}
+	v.lastSeen = time.Now()
+	return v.limiter
+}
+
+func (rl *rateLimiter) cleanup() {
+	for {
+		time.Sleep(5 * time.Minute)
+		rl.mu.Lock()
+		for ip, v := range rl.visitors {
+			if time.Since(v.lastSeen) > 10*time.Minute {
+				delete(rl.visitors, ip)
+			}
+		}
+		rl.mu.Unlock()
+	}
+}
+
+func (rl *rateLimiter) middleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		if ip == "" {
+			ip = r.RemoteAddr
+		}
+		if fwd := r.Header.Get("X-Forwarded-For"); fwd != "" {
+			ip = fwd
+		}
+
+		limiter := rl.getLimiter(ip)
+		if !limiter.Allow() {
+			log.Printf("Rate limit exceeded for %s on %s", ip, r.URL.Path)
+			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("Retry-After", "60")
+			w.WriteHeader(http.StatusTooManyRequests)
+			w.Write([]byte(`{"error":"rate limit exceeded","retry_after":60}`))
+			return
+		}
+		next(w, r)
+	}
 }
 
 const robotsTxt = `User-agent: *
