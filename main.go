@@ -298,6 +298,7 @@ const landingHTML = `<!DOCTYPE html>
 
   /* --- Section --- */
   .section{padding:64px 0}
+  .section-alt{background:rgba(255,255,255,0.02);margin:0 -24px;padding:64px 24px;border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04)}
   .section-label{display:inline-block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#4ade80;background:rgba(74,222,128,0.1);padding:6px 14px;border-radius:100px;margin-bottom:16px}
   .section-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:#f1f5f9;margin-bottom:12px;letter-spacing:-0.02em}
   .section-desc{color:#94a3b8;font-size:1rem;line-height:1.7;max-width:600px}
@@ -526,10 +527,9 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
-  <hr class="gradient-divider">
 
   <!-- Examples -->
-  <section class="section fade-in fade-in-3" id="examples">
+  <section class="section section-alt fade-in fade-in-3" id="examples">
     <span class="section-label">In Action</span>
     <h2 class="section-title">Example Queries</h2>
     <p class="section-desc">See what you can ask your AI agent when connected to LiveScore MCP.</p>
@@ -549,7 +549,6 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
-  <hr class="gradient-divider">
 
   <!-- Connect -->
   <section class="section fade-in fade-in-3" id="connect">
@@ -584,10 +583,9 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
-  <hr class="gradient-divider">
 
   <!-- Tools -->
-  <section class="section fade-in fade-in-3 tools-section" id="tools">
+  <section class="section section-alt fade-in fade-in-3 tools-section" id="tools">
     <span class="section-label">Capabilities</span>
     <h2 class="section-title">Available Football Data Tools</h2>
     <p class="section-desc">10 powerful tools to access real-time football data from leagues worldwide.</p>
@@ -645,7 +643,6 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
-  <hr class="gradient-divider">
 
   <!-- Languages -->
   <section class="section fade-in fade-in-4" id="languages">
@@ -670,10 +667,9 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
-  <hr class="gradient-divider">
 
   <!-- Powered By -->
-  <section class="section fade-in fade-in-4" id="powered-by">
+  <section class="section section-alt fade-in fade-in-4" id="powered-by">
     <span class="section-label">Data Source</span>
     <h2 class="section-title">Powered By</h2>
     <p class="section-desc">LiveScore MCP is built on top of comprehensive football data.</p>
@@ -686,7 +682,6 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
-  <hr class="gradient-divider">
 
   <!-- Get the App -->
   <section class="section fade-in fade-in-4" id="get-app" style="text-align:center">
@@ -706,10 +701,9 @@ const landingHTML = `<!DOCTYPE html>
     <p class="app-tagline">Your home for live football &mdash; powered by football-mania.com</p>
   </section>
 
-  <hr class="gradient-divider">
 
   <!-- Usage Policy -->
-  <section class="section fade-in fade-in-4" id="usage-policy">
+  <section class="section section-alt fade-in fade-in-4" id="usage-policy">
     <span class="section-label">Fair Use</span>
     <h2 class="section-title">Usage Policy</h2>
     <p class="section-desc">LiveScore MCP is free for personal and non-commercial use. Please respect the following guidelines.</p>
@@ -735,7 +729,6 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
-  <hr class="gradient-divider">
 
   <!-- FAQ -->
   <section class="section fade-in fade-in-5" id="faq">
