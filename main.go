@@ -411,7 +411,15 @@ const landingHTML = `<!DOCTYPE html>
   .chat-a::before{content:'LiveScore MCP';position:absolute;top:-20px;left:0;font-size:0.7rem;font-weight:600;color:#22d3ee;text-transform:uppercase;letter-spacing:0.05em}
   .chat-a strong{color:#4ade80;font-weight:700}
   .chat-a .score{font-family:'SF Mono',Consolas,monospace;color:#22d3ee;font-weight:600}
-  @media(max-width:640px){.example-item{grid-template-columns:1fr}.chat-q,.chat-a{font-size:0.82rem;padding:14px 16px}}
+  @media(max-width:640px){
+    .examples-grid{gap:24px}
+    .example-item{display:flex;flex-direction:column;gap:4px}
+    .chat-q,.chat-a{font-size:0.82rem;padding:12px 16px;max-width:85%;margin-top:20px}
+    .chat-q{align-self:flex-end;border-top-left-radius:16px;border-top-right-radius:4px;border-bottom-right-radius:4px;text-align:right}
+    .chat-q::before{right:0;left:auto}
+    .chat-a{align-self:flex-start;border-top-left-radius:4px;border-top-right-radius:16px;border-bottom-left-radius:4px}
+    .chat-a::before{content:'MCP';font-size:0.65rem}
+  }
 
   /* --- Usage Policy --- */
   .policy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:32px}
@@ -437,6 +445,7 @@ const landingHTML = `<!DOCTYPE html>
     .footer-inner{flex-direction:column;text-align:center}
     .footer-links{justify-content:center;flex-wrap:wrap}
     .section{padding:48px 0}
+    .section-alt{margin:0 -16px;padding:48px 16px}
     .connect-box{padding:20px}
     pre{font-size:0.72rem;padding:16px}
     .policy-grid{grid-template-columns:1fr}
