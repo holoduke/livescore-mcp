@@ -81,21 +81,44 @@ func main() {
 		w.Header().Set("Content-Type", "application/xml")
 		fmt.Fprint(w, sitemapXML)
 	})
-	mux.Handle("/static/", http.FileServer(http.FS(staticFiles)))
+	mux.Handle("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		http.FileServer(http.FS(staticFiles)).ServeHTTP(w, r)
+	}))
 	mux.HandleFunc("/privacy", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=3600")
 		fmt.Fprint(w, privacyHTML)
 	})
+	mux.HandleFunc("/terms", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=3600")
+		fmt.Fprint(w, termsHTML)
+	})
+
+	handler := securityHeaders(mux)
 
 	log.Printf("LiveScore MCP Server %s starting on :%s", serverVersion, port)
-	if err := (&http.Server{Addr: ":" + port, Handler: mux}).ListenAndServe(); err != nil {
+	if err := (&http.Server{Addr: ":" + port, Handler: handler}).ListenAndServe(); err != nil {
 		log.Fatalf("Server error: %v", err)
 	}
 }
 
 func serveLandingPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Cache-Control", "public, max-age=300")
 	fmt.Fprint(w, landingHTML)
+}
+
+func securityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+		w.Header().Set("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+		next.ServeHTTP(w, r)
+	})
 }
 
 // --- Rate Limiter ---
@@ -195,6 +218,12 @@ const sitemapXML = `<?xml version="1.0" encoding="UTF-8"?>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
+  <url>
+    <loc>https://livescoremcp.com/terms</loc>
+    <lastmod>2026-02-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
 </urlset>
 `
 
@@ -204,6 +233,9 @@ const landingHTML = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-site-verification" content="-pqJ43CJw50bMGSEVUOCp70hPo68NYDT6GB1qGQJFPM">
+<meta name="theme-color" content="#06080f">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/og-image.png">
 
 <!-- Primary Meta Tags -->
 <title>LiveScore MCP - Football Live Scores API for AI Agents</title>
@@ -220,6 +252,9 @@ const landingHTML = `<!DOCTYPE html>
 <meta property="og:title" content="LiveScore MCP - Football Live Scores for AI Agents">
 <meta property="og:description" content="Free MCP server with 10 tools for real-time football scores, fixtures, team stats and player data. Works with Claude, Cursor and any MCP client.">
 <meta property="og:image" content="https://livescoremcp.com/static/og-image.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="1024">
+<meta property="og:image:alt" content="LiveScore MCP - Football Live Scores API for AI Agents">
 <meta property="og:site_name" content="LiveScore MCP">
 <meta property="og:locale" content="en_US">
 
@@ -229,6 +264,7 @@ const landingHTML = `<!DOCTYPE html>
 <meta name="twitter:title" content="LiveScore MCP - Football Live Scores for AI Agents">
 <meta name="twitter:description" content="Free MCP server with 10 tools for real-time football scores, fixtures, team stats and player data. Works with Claude, Cursor and any MCP client.">
 <meta name="twitter:image" content="https://livescoremcp.com/static/og-image.png">
+<meta name="twitter:image:alt" content="LiveScore MCP - Football Live Scores API for AI Agents">
 
 <!-- Schema.org JSON-LD: SoftwareApplication -->
 <script type="application/ld+json">
@@ -251,8 +287,12 @@ const landingHTML = `<!DOCTYPE html>
     "url": "https://github.com/holoduke"
   },
   "softwareVersion": "1.0.0",
+  "datePublished": "2026-02-20",
+  "dateModified": "2026-02-26",
   "codeRepository": "https://github.com/holoduke/livescore-mcp",
   "programmingLanguage": "Go",
+  "screenshot": "https://livescoremcp.com/static/og-image.png",
+  "installUrl": "https://livescoremcp.com/#connect",
   "keywords": ["MCP", "Model Context Protocol", "football", "live scores", "soccer", "API", "AI", "Claude", "SSE"]
 }
 </script>
@@ -313,9 +353,24 @@ const landingHTML = `<!DOCTYPE html>
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "LiveScore MCP",
-  "url": "https://livescoremcp.com"
+  "url": "https://livescoremcp.com",
+  "description": "Free MCP server for real-time football scores, fixtures, team stats and player data for AI agents.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "holoduke",
+    "url": "https://github.com/holoduke"
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://livescoremcp.com/#examples",
+    "query-input": "required name=search_term_string"
+  }
 }
 </script>
+
+<!-- Preload critical resources -->
+<link rel="preload" href="/static/hero-bg.png" as="image">
+<link rel="dns-prefetch" href="https://github.com">
 
 <!-- Google Fonts: Inter -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -859,8 +914,9 @@ const landingHTML = `<!DOCTYPE html>
       <a href="#tools">Tools</a>
       <a href="#faq">FAQ</a>
       <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
     </div>
-    <div class="footer-built">Powered by <a href="https://football-mania.com">football-mania.com</a> &bull; Built with <a href="https://github.com/mark3labs/mcp-go">mcp-go</a> &bull; <a href="https://github.com/holoduke/livescore-mcp">Source on GitHub</a></div>
+    <div class="footer-built">Powered by <a href="https://football-mania.com" target="_blank" rel="noopener noreferrer">football-mania.com</a> &bull; Built with <a href="https://github.com/mark3labs/mcp-go" target="_blank" rel="noopener noreferrer">mcp-go</a> &bull; <a href="https://github.com/holoduke/livescore-mcp" target="_blank" rel="noopener noreferrer">Source on GitHub</a></div>
   </div>
 </footer>
 </body>
@@ -956,6 +1012,98 @@ const privacyHTML = `<!DOCTYPE html>
 </div>
 <footer class="footer">
   Powered by <a href="https://football-mania.com">football-mania.com</a> &bull; <a href="https://github.com/holoduke/livescore-mcp">Source on GitHub</a>
+</footer>
+</body>
+</html>`
+
+const termsHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#06080f">
+<title>Terms of Service - LiveScore MCP</title>
+<meta name="description" content="Terms of Service for LiveScore MCP - Free football live scores API for AI agents via the Model Context Protocol.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://livescoremcp.com/terms">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#06080f;color:#e0e6ed;min-height:100vh}
+  .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:56px;display:flex;align-items:center;background:rgba(6,8,15,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06)}
+  .nav-logo{font-weight:800;font-size:1.1rem;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px}
+  .nav-logo svg{flex-shrink:0}
+  .container{max-width:720px;margin:0 auto;padding:100px 24px 60px}
+  h1{font-size:2rem;font-weight:800;margin-bottom:8px;color:#f1f5f9}
+  .updated{color:#64748b;font-size:0.85rem;margin-bottom:40px}
+  h2{font-size:1.2rem;font-weight:700;color:#f1f5f9;margin:32px 0 12px}
+  p,li{color:#94a3b8;font-size:0.92rem;line-height:1.8;margin-bottom:12px}
+  ul{padding-left:24px}
+  a{color:#4ade80;text-decoration:none}
+  a:hover{text-decoration:underline}
+  .footer{border-top:1px solid rgba(255,255,255,0.06);padding:32px 24px;text-align:center}
+  .footer a{color:#64748b;font-size:0.85rem;text-decoration:none;margin:0 12px}
+  .footer a:hover{color:#4ade80}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="nav-logo"><svg width="24" height="21" viewBox="0 0 159.83 139.7" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M121.35,34.77c-1.38-1.63-3.4-2.57-5.52-2.57h-60.88c-3.39,0-6.3,2.42-6.91,5.75l-11.16,61.01c-.38,2.1.19,4.25,1.57,5.9,1.39,1.66,3.41,2.62,5.56,2.62h61.97c3.46,0,6.37-2.47,6.93-5.87l10.07-61.01c.34-2.08-.25-4.21-1.63-5.83ZM68.74,42.53c5.65-.23,11.13.79,16.34,3.03,5.21,2.24,9.73,5.53,13.44,9.77l.95,1.08-17.51-3.83-14.66-10,1.44-.06ZM57.38,82.64l-.26-.13v-.29c-.12-7.38.16-12.31,1.12-19.57l.04-.32.32-.08c7.55-1.82,12.74-2.71,20.57-3.54l.27-.03.16.21c4.78,6.25,7.7,10.63,11.59,17.36l.16.28-.21.25c-4.6,5.68-7.98,9.29-13.42,14.28l-.21.19-.27-.1c-7.62-2.74-12.63-4.89-19.87-8.54ZM46.86,49.79c4.27-3.22,9.27-5.53,14.84-6.52l-.03.36c-2.03.59-3.97,1.37-5.83,2.3l-5.56,12.35-5.64,3.71,2.23-12.19ZM37.83,99.13l2.43-13.28,5.92,4.34,2.32,16.31h-4.5c-3.89,0-6.87-3.56-6.17-7.37ZM99.23,106.5h-23.11l5.03-4.72,13.13,2.52c1.67-1.54,3.21-3.27,4.57-5.2,1.33-1.84,2.46-3.8,3.42-5.83l-2.45-13.71,5.41-13.23.42,1.17c.22.61.38,1.23.56,1.84,4.6,12.1,1.81,26.93-6.98,37.15Z" fill="#fff"/></svg> LiveScore MCP</a>
+</nav>
+<div class="container">
+  <h1>Terms of Service</h1>
+  <p class="updated">Last updated: February 26, 2026</p>
+
+  <h2>1. Acceptance of Terms</h2>
+  <p>By accessing or using LiveScore MCP ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service.</p>
+
+  <h2>2. Description of Service</h2>
+  <p>LiveScore MCP is a free Model Context Protocol (MCP) server that provides real-time football live scores, fixtures, team statistics, and player data. The Service is provided via an SSE (Server-Sent Events) endpoint for use with MCP-compatible AI clients.</p>
+
+  <h2>3. Acceptable Use</h2>
+  <p>You agree to use the Service only for lawful purposes. You must not:</p>
+  <ul>
+    <li>Attempt to circumvent rate limits or abuse the Service</li>
+    <li>Scrape data aggressively or in a manner that degrades the experience for others</li>
+    <li>Use the Service for any unlawful or unauthorized purpose</li>
+    <li>Reverse-engineer, decompile, or attempt to extract the underlying data sources</li>
+    <li>Redistribute the data commercially without prior written consent</li>
+  </ul>
+
+  <h2>4. Rate Limits</h2>
+  <p>The Service enforces rate limits to ensure fair access for all users. Exceeding these limits may result in temporary or permanent suspension of access. For commercial use or higher rate limits, contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
+
+  <h2>5. Commercial Use</h2>
+  <p>The Service is free for personal and non-commercial use. Commercial use requires a separate licensing agreement. Please contact us for commercial inquiries.</p>
+
+  <h2>6. Data Accuracy</h2>
+  <p>While we strive to provide accurate and timely football data, we make no warranties regarding the accuracy, completeness, or reliability of the data. The data is sourced from third-party providers and may contain errors or delays.</p>
+
+  <h2>7. Availability</h2>
+  <p>The Service is provided on an "as is" and "as available" basis. We do not guarantee uninterrupted or error-free operation. We reserve the right to modify, suspend, or discontinue the Service at any time without notice.</p>
+
+  <h2>8. Limitation of Liability</h2>
+  <p>To the fullest extent permitted by law, the Service and its operators shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Service.</p>
+
+  <h2>9. Intellectual Property</h2>
+  <p>The LiveScore MCP source code is available on <a href="https://github.com/holoduke/livescore-mcp" target="_blank" rel="noopener noreferrer">GitHub</a>. The football data provided through the Service is owned by the respective data providers and is subject to their terms.</p>
+
+  <h2>10. Termination</h2>
+  <p>We reserve the right to terminate or restrict your access to the Service at any time, for any reason, including but not limited to violation of these Terms.</p>
+
+  <h2>11. Changes to Terms</h2>
+  <p>We may update these Terms from time to time. Continued use of the Service after changes constitutes acceptance of the new Terms.</p>
+
+  <h2>12. Contact</h2>
+  <p>For questions about these Terms, contact: <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a></p>
+</div>
+<footer class="footer">
+  <a href="/">Home</a>
+  <a href="/privacy">Privacy Policy</a>
+  <a href="https://github.com/holoduke/livescore-mcp" target="_blank" rel="noopener noreferrer">GitHub</a>
 </footer>
 </body>
 </html>`
