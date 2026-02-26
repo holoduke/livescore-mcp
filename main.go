@@ -233,6 +233,9 @@ const landingHTML = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-site-verification" content="-pqJ43CJw50bMGSEVUOCp70hPo68NYDT6GB1qGQJFPM">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3J7HVJS6ZB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3J7HVJS6ZB');</script>
 <meta name="theme-color" content="#06080f">
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/static/og-image.png">
@@ -928,6 +931,8 @@ const privacyHTML = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy Policy - LiveScore MCP</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3J7HVJS6ZB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3J7HVJS6ZB');</script>
 <meta name="description" content="Privacy Policy for LiveScore MCP - Football Live Scores API for AI Agents">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://livescoremcp.com/privacy">
@@ -1023,6 +1028,8 @@ const termsHTML = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#06080f">
 <title>Terms of Service - LiveScore MCP</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3J7HVJS6ZB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3J7HVJS6ZB');</script>
 <meta name="description" content="Terms of Service for LiveScore MCP - Free football live scores API for AI agents via the Model Context Protocol.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://livescoremcp.com/terms">
