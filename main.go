@@ -915,7 +915,7 @@ function generateGrid() {
       if (isOcc(row, col, span)) continue;
       var imgIdx = pickImage(row, col, span);
       markOcc(row, col, span, imgIdx);
-      cells.push({ row: row + 1, col: col + 1, span: span, image: '/static/grid/' + images[imgIdx] + '.png' });
+      cells.push({ row: row + 1, col: col + 1, span: span, image: '/static/grid/' + images[imgIdx] + '.webp' });
     }
   }
 
