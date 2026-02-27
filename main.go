@@ -975,21 +975,18 @@ if (window.ResizeObserver) {
   new ResizeObserver(clipGrid).observe(document.getElementById('overlay'));
 }
 
-// Random cell pulse effect
-function pulseRandomCells() {
+// Random cell pulse effect — one at a time
+function pulseRandomCell() {
   var cells = container.querySelectorAll('.grid-cell:not(.pulse)');
   if (cells.length === 0) return;
-  var count = 1 + Math.floor(Math.random() * 3);
-  for (var i = 0; i < count && i < cells.length; i++) {
-    var idx = Math.floor(Math.random() * cells.length);
-    var cell = cells[idx];
-    cell.classList.add('pulse');
-    cell.addEventListener('animationend', function() {
-      this.classList.remove('pulse');
-    }, { once: true });
-  }
+  var idx = Math.floor(Math.random() * cells.length);
+  var cell = cells[idx];
+  cell.classList.add('pulse');
+  cell.addEventListener('animationend', function() {
+    this.classList.remove('pulse');
+  }, { once: true });
 }
-setInterval(pulseRandomCells, 2000);
+setInterval(pulseRandomCell, 1000);
 
 var resizeTimer;
 window.addEventListener('resize', function() {
