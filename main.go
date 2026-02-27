@@ -515,7 +515,8 @@ const landingHTML = `<!DOCTYPE html>
   @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } }
 
   /* --- Sections --- */
-  .section { padding: 48px 0; width: 100%; max-width: 700px; pointer-events: auto; }
+  .section { align-self: stretch; max-width: none; width: auto; padding: 56px max(24px, calc(50% - 350px)); pointer-events: auto; background: rgba(6,8,15,0.96); border-top: 1px solid rgba(255,255,255,0.06); }
+  .section-alt { background: rgba(10,14,24,0.97); }
   .section-label { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #4ade80; background: rgba(74,222,128,0.1); padding: 6px 14px; border-radius: 100px; margin-bottom: 16px; }
   .section-title { font-size: clamp(1.5rem,3vw,2rem); font-weight: 800; color: #f1f5f9; margin-bottom: 12px; letter-spacing: -0.02em; background: linear-gradient(135deg,#f1f5f9 0%,#4ade80 50%,#22d3ee 100%); background-size: 200% 200%; animation: gradientShift 6s ease infinite; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   .section-desc { color: #94a3b8; font-size: 1rem; line-height: 1.7; max-width: 600px; }
@@ -562,7 +563,7 @@ const landingHTML = `<!DOCTYPE html>
   .policy-note strong { color: #eab308; }
 
   /* --- Footer --- */
-  .site-footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 48px 24px; pointer-events: auto; width: 100%; max-width: 700px; }
+  .site-footer { align-self: stretch; max-width: none; width: auto; border-top: 1px solid rgba(255,255,255,0.06); padding: 48px max(24px, calc(50% - 350px)); pointer-events: auto; background: rgba(4,6,12,0.97); }
   .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
   .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
   .footer-links a { color: #64748b; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
@@ -590,13 +591,14 @@ const landingHTML = `<!DOCTYPE html>
     .code-block { font-size: 11px; padding: 10px 12px; }
     .endpoint { font-size: 11px; }
     .tools-grid { grid-template-columns: 1fr; }
-    .section { padding: 36px 0; }
+    .section { padding: 40px 20px; }
     .policy-grid { grid-template-columns: 1fr; }
     .policy-note { padding: 16px; }
     .powered-card { flex-direction: column; text-align: center; }
     .footer-inner { flex-direction: column; text-align: center; }
     .footer-links { justify-content: center; }
     .footer-built { text-align: center; font-size: 0.75rem; }
+    .site-footer { padding: 40px 20px; }
   }
 
   @media (max-width: 480px) {
@@ -610,6 +612,7 @@ const landingHTML = `<!DOCTYPE html>
     .step-num { width: 24px; height: 24px; font-size: 11px; }
     .step-content { font-size: 12px; }
     .code-block { font-size: 10px; padding: 8px 10px; }
+    .section { padding: 32px 16px; }
     .app-badges { flex-direction: column; align-items: center; }
     .app-badge { width: 100%; justify-content: center; }
     .site-footer { padding: 32px 16px; }
@@ -717,7 +720,7 @@ const landingHTML = `<!DOCTYPE html>
   </section>
 
   <!-- Powered By -->
-  <section class="section" id="powered-by">
+  <section class="section section-alt" id="powered-by">
     <span class="section-label">Data Source</span>
     <h2 class="section-title">Powered By</h2>
     <p class="section-desc">LiveScore MCP is built on top of comprehensive football data.</p>
@@ -749,7 +752,7 @@ const landingHTML = `<!DOCTYPE html>
   </section>
 
   <!-- Usage Policy -->
-  <section class="section" id="usage-policy">
+  <section class="section section-alt" id="usage-policy">
     <span class="section-label">Fair Use</span>
     <h2 class="section-title">Usage Policy</h2>
     <p class="section-desc">LiveScore MCP is free for personal and non-commercial use. Please respect the following guidelines.</p>
