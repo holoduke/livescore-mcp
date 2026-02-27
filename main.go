@@ -437,7 +437,7 @@ const landingHTML = `<!DOCTYPE html>
     flex-direction: column;
     align-items: center;
     pointer-events: none;
-    padding: 80px 20px 60px;
+    padding: 100px 20px 60px;
   }
 
   #title {
@@ -604,6 +604,93 @@ const landingHTML = `<!DOCTYPE html>
   .footer-built a { color: #64748b; text-decoration: none; font-weight: 500; }
   .footer-built a:hover { color: #4ade80; }
 
+  /* --- Header --- */
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 56px;
+    background: rgba(6,8,15,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .header-logo .logo-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #4ade80, #22d3ee);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .header-nav a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .header-nav a:hover { color: #4ade80; }
+
+  .header-cta {
+    padding: 7px 16px;
+    background: rgba(74,222,128,0.15);
+    border: 1px solid rgba(74,222,128,0.3);
+    border-radius: 8px;
+    color: #4ade80 !important;
+    font-weight: 600 !important;
+    font-size: 0.82rem !important;
+    transition: all 0.2s !important;
+  }
+
+  .header-cta:hover {
+    background: rgba(74,222,128,0.25) !important;
+    border-color: rgba(74,222,128,0.5) !important;
+  }
+
+  @media (max-width: 768px) {
+    .site-header { padding: 0 16px; height: 48px; }
+    .header-nav { gap: 16px; }
+    .header-nav a { font-size: 0.78rem; }
+    .header-nav .nav-hide-mobile { display: none; }
+    .header-logo { font-size: 0.9rem; }
+    .header-logo .logo-icon { width: 24px; height: 24px; font-size: 12px; }
+  }
+
+  @media (max-width: 480px) {
+    .site-header { padding: 0 12px; }
+    .header-nav { gap: 12px; }
+    .header-cta { padding: 5px 12px; }
+  }
+
   /* --- noscript --- */
   .noscript-content { max-width: 700px; margin: 60px auto; padding: 0 24px; color: #94a3b8; }
   .noscript-content h2 { color: #f1f5f9; margin: 24px 0 8px; }
@@ -654,6 +741,20 @@ const landingHTML = `<!DOCTYPE html>
 </style>
 </head>
 <body>
+
+<header class="site-header">
+  <a href="/" class="header-logo">
+    <span class="logo-icon">&#9917;</span>
+    LiveScore MCP
+  </a>
+  <nav class="header-nav">
+    <a href="#tools" class="nav-hide-mobile">Tools</a>
+    <a href="#powered-by" class="nav-hide-mobile">Data Source</a>
+    <a href="#get-app">App</a>
+    <a href="https://github.com/holoduke/livescore-mcp" target="_blank" rel="noopener">GitHub</a>
+    <a href="#steps-card" class="header-cta">Get Started</a>
+  </nav>
+</header>
 
 <div id="overlay">
   <h1 id="title">Football<br>Livescore MCP</h1>
