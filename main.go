@@ -208,7 +208,7 @@ const sitemapXML = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://livescoremcp.com/</loc>
-    <lastmod>2026-02-24</lastmod>
+    <lastmod>2026-02-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -291,11 +291,11 @@ const landingHTML = `<!DOCTYPE html>
   },
   "softwareVersion": "1.0.0",
   "datePublished": "2026-02-20",
-  "dateModified": "2026-02-26",
+  "dateModified": "2026-02-27",
   "codeRepository": "https://github.com/holoduke/livescore-mcp",
   "programmingLanguage": "Go",
   "screenshot": "https://livescoremcp.com/static/og-image.png",
-  "installUrl": "https://livescoremcp.com/#connect",
+  "installUrl": "https://livescoremcp.com/",
   "keywords": ["MCP", "Model Context Protocol", "football", "live scores", "soccer", "API", "AI", "Claude", "SSE"]
 }
 </script>
@@ -340,10 +340,10 @@ const landingHTML = `<!DOCTYPE html>
     },
     {
       "@type": "Question",
-      "name": "What languages does LiveScore MCP support?",
+      "name": "What leagues and competitions are supported?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "LiveScore MCP supports multiple languages including English (en), Dutch (nl), German (de), French (fr), Spanish (es), Portuguese (pt), Italian (it), and more. Use the language parameter on any tool to get results in your preferred language."
+        "text": "LiveScore MCP covers 1000+ football leagues and competitions worldwide, including the Premier League, La Liga, Serie A, Bundesliga, Eredivisie, Ligue 1, Champions League, Europa League, World Cup, and many more domestic and international tournaments."
       }
     }
   ]
@@ -362,378 +362,303 @@ const landingHTML = `<!DOCTYPE html>
     "@type": "Organization",
     "name": "holoduke",
     "url": "https://github.com/holoduke"
-  },
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://livescoremcp.com/#examples",
-    "query-input": "required name=search_term_string"
   }
 }
 </script>
 
-<!-- Preload critical resources -->
-<link rel="preload" href="/static/hero-bg.png" as="image">
 <link rel="dns-prefetch" href="https://github.com">
 
-<!-- Google Fonts: Inter -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#06080f;color:#e0e6ed;min-height:100vh;overflow-x:hidden}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; min-height: 100vh; background: #06080f; overflow-x: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; color: #e0e6ed; }
 
-  /* --- Animations --- */
-  @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-  @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
-  @keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,30px)}}
-  @keyframes pulse{0%,100%{opacity:0.4}50%{opacity:0.8}}
-  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-  @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
-  @keyframes gradientDivider{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-  .fade-in{opacity:0;animation:fadeInUp 0.7s ease forwards}
-  .fade-in-1{animation-delay:0.1s}
-  .fade-in-2{animation-delay:0.2s}
-  .fade-in-3{animation-delay:0.3s}
-  .fade-in-4{animation-delay:0.4s}
-  .fade-in-5{animation-delay:0.5s}
+  #grid-container {
+    width: 100%;
+    display: grid;
+    gap: 6px;
+  }
 
-  /* --- Sticky Nav --- */
-  .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,8,15,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s}
-  .nav-logo{font-weight:800;font-size:1.1rem;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px}
-  .nav-logo svg{flex-shrink:0}
-  .nav-links{display:flex;align-items:center;gap:24px}
-  .nav-links a{color:#94a3b8;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.2s}
-  .nav-links a:hover{color:#fff}
-  .nav-gh{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);padding:6px 14px;border-radius:8px;color:#e0e6ed;text-decoration:none;font-size:0.8rem;font-weight:600;transition:background 0.2s}
-  .nav-gh:hover{background:rgba(255,255,255,0.14)}
+  .grid-cell {
+    position: relative;
+    overflow: hidden;
+    transition: filter 0.3s ease, transform 0.15s ease;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+  }
 
-  /* --- Hero --- */
-  .hero{position:relative;text-align:center;padding:140px 24px 80px;overflow:hidden;min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .hero-bg{position:absolute;inset:0;background:url('/static/hero-bg.png') center center/cover no-repeat;z-index:0;opacity:0.25}
-  .hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,15,0.5) 0%,rgba(6,8,15,0.2) 40%,rgba(6,8,15,0.7) 100%)}
-  .hero-orb{position:absolute;border-radius:50%;filter:blur(80px);z-index:0}
-  .hero-orb-1{width:400px;height:400px;background:rgba(74,222,128,0.12);top:-100px;left:-100px;animation:float 8s ease-in-out infinite}
-  .hero-orb-2{width:350px;height:350px;background:rgba(34,211,238,0.10);bottom:-80px;right:-80px;animation:float2 10s ease-in-out infinite}
-  .hero-orb-3{width:200px;height:200px;background:rgba(168,85,247,0.08);top:50%;left:60%;animation:float 12s ease-in-out infinite,pulse 4s ease-in-out infinite}
-  .hero *:not(.hero-bg):not(.hero-orb){position:relative;z-index:1}
-  .hero h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:900;letter-spacing:-0.03em;line-height:1.1;margin-bottom:20px;background:linear-gradient(135deg,#4ade80 0%,#22d3ee 50%,#a78bfa 100%);background-size:200% 200%;animation:gradientShift 6s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 2px 8px rgba(74,222,128,0.3))}
-  .hero-sub{font-size:clamp(1rem,2.5vw,1.3rem);color:#94a3b8;max-width:560px;margin:0 auto 32px;line-height:1.6;font-weight:400}
-  .hero-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-bottom:36px}
-  .hero-stat{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:8px 18px;border-radius:100px;font-size:0.85rem;font-weight:600;color:#cbd5e1}
-  .hero-stat em{font-style:normal;color:#4ade80}
-  .hero-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:12px;font-size:0.9rem;font-weight:600;text-decoration:none;transition:all 0.2s}
-  .btn-primary{background:linear-gradient(135deg,#4ade80,#22d3ee);color:#06080f}
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(74,222,128,0.3)}
-  .btn-secondary{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#e0e6ed}
-  .btn-secondary:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px)}
+  .grid-cell:hover {
+    filter: brightness(1.3);
+    z-index: 10;
+    transform: scale(1.02);
+  }
 
-  /* --- Container --- */
-  .container{max-width:960px;margin:0 auto;padding:0 24px}
+  /* Content overlay */
+  #overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    padding: 80px 20px 60px;
+  }
 
-  /* --- Section --- */
-  .section{padding:64px 0}
-  .section-alt{background:rgba(255,255,255,0.02);margin:0 -24px;padding:64px 24px;border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04)}
-  .section-label{display:inline-block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#4ade80;background:rgba(74,222,128,0.1);padding:6px 14px;border-radius:100px;margin-bottom:16px}
-  .section-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:#f1f5f9;margin-bottom:12px;letter-spacing:-0.02em}
-  .section-desc{color:#94a3b8;font-size:1rem;line-height:1.7;max-width:600px}
+  #title {
+    font-family: 'Arial Black', 'Impact', sans-serif;
+    font-size: clamp(48px, 8vw, 120px);
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: center;
+    line-height: 1.05;
+    -webkit-text-stroke: 5px rgba(0,0,0,0.8);
+    paint-order: stroke fill;
+    text-shadow:
+      0 0 40px rgba(0,0,0,0.9),
+      0 0 80px rgba(0,0,0,0.6),
+      0 6px 0 rgba(0,0,0,0.7);
+  }
 
-  /* --- How It Works --- */
-  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:40px;position:relative}
-  .steps::before{content:'';position:absolute;top:40px;left:calc(16.66% + 20px);right:calc(16.66% + 20px);height:2px;background:linear-gradient(90deg,rgba(74,222,128,0.3),rgba(34,211,238,0.3));z-index:0}
-  .step{text-align:center;position:relative;z-index:1}
-  .step-num{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,rgba(74,222,128,0.15),rgba(34,211,238,0.15));border:1px solid rgba(74,222,128,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:#4ade80;margin-bottom:16px}
-  .step h3{font-size:1rem;font-weight:700;color:#f1f5f9;margin-bottom:8px}
-  .step p{font-size:0.85rem;color:#94a3b8;line-height:1.6}
+  .card {
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 24px 28px;
+    max-width: 640px;
+    width: 92%;
+    pointer-events: auto;
+  }
 
-  /* --- Connect --- */
-  .connect-grid{display:grid;gap:16px;margin-top:32px}
-  .connect-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:border-color 0.3s}
-  .connect-box:hover{border-color:rgba(74,222,128,0.2)}
-  .connect-box h3{color:#22d3ee;margin-bottom:12px;font-size:0.9rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
-  .connect-box p{color:#94a3b8;font-size:0.9rem;margin-bottom:12px;line-height:1.6}
-  .code-wrap{position:relative}
-  pre{background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;overflow-x:auto;font-family:'SF Mono',Consolas,monospace;font-size:0.82rem;line-height:1.7;color:#c9d1d9}
-  .code-key{color:#79c0ff}
-  .code-str{color:#a5d6ff}
-  .code-val{color:#7ee787}
-  .copy-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;padding:6px 12px;border-radius:8px;font-size:0.72rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif}
-  .copy-btn:hover{background:rgba(255,255,255,0.14);color:#fff}
-  .endpoint-url{font-family:'SF Mono',Consolas,monospace;background:rgba(74,222,128,0.1);color:#4ade80;padding:3px 10px;border-radius:6px;font-size:0.85rem;font-weight:600}
+  #chat-card { margin-top: 32px; height: 280px; overflow-y: auto; }
+  #steps-card { margin-top: 20px; }
 
-  /* --- Tools --- */
-  .tools-section{position:relative}
-  .tools-section::before{content:'';position:absolute;inset:0;background:url('/static/tools-bg.png') center center/cover no-repeat;opacity:0.06;z-index:0;pointer-events:none;border-radius:20px}
-  .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:32px;position:relative;z-index:1}
-  .tool-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-left:3px solid;border-image:linear-gradient(180deg,#4ade80,#22d3ee) 1;border-radius:14px;padding:24px;transition:all 0.3s ease;cursor:default}
-  .tool-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.15)}
-  .tool-icon{font-size:1.5rem;margin-bottom:12px;display:block}
-  .tool-card h3{font-family:'SF Mono',Consolas,monospace;color:#4ade80;font-size:0.9rem;margin-bottom:8px;font-weight:700}
-  .tool-card p{color:#94a3b8;font-size:0.82rem;line-height:1.6}
+  #steps-card h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 18px;
+  }
 
-  /* --- Languages --- */
-  .lang-pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
-  .lang-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:10px 18px;border-radius:12px;font-size:0.85rem;font-weight:600;color:#cbd5e1;transition:all 0.2s}
-  .lang-pill:hover{border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.05)}
-  .lang-flag{font-size:1.1rem}
-  .lang-code{color:#4ade80;font-family:'SF Mono',Consolas,monospace;font-size:0.8rem}
+  .step { display: flex; gap: 14px; margin-bottom: 16px; }
+  .step:last-child { margin-bottom: 0; }
 
-  /* --- FAQ --- */
-  .faq-list{margin-top:32px}
-  .faq-item{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;margin-bottom:12px;overflow:hidden;transition:border-color 0.3s}
-  .faq-item:hover{border-color:rgba(255,255,255,0.1)}
-  .faq-item summary{padding:20px 24px;cursor:pointer;font-weight:600;font-size:0.95rem;color:#f1f5f9;list-style:none;display:flex;align-items:center;gap:12px;transition:color 0.2s}
-  .faq-item summary::-webkit-details-marker{display:none}
-  .faq-item summary::before{content:'+';display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:rgba(74,222,128,0.1);color:#4ade80;font-weight:700;font-size:1.1rem;flex-shrink:0;transition:all 0.2s}
-  .faq-item[open] summary::before{content:'-';background:rgba(74,222,128,0.2)}
-  .faq-answer{padding:0 24px 20px 64px;color:#94a3b8;line-height:1.7;font-size:0.9rem}
-  .faq-answer a{color:#4ade80;text-decoration:none;font-weight:500}
-  .faq-answer a:hover{text-decoration:underline}
+  .step-num {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3);
+    color: rgba(147,187,252,0.9); font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .step-content { font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.85); }
+  .step-content strong { color: #fff; }
+
+  .endpoint {
+    display: inline-block; margin-top: 6px; padding: 4px 10px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px; font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px; color: rgba(139,233,160,0.9); word-break: break-all;
+  }
+
+  .code-block {
+    margin-top: 8px; padding: 12px 14px; background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px;
+    line-height: 1.6; color: rgba(255,255,255,0.75); overflow-x: auto;
+  }
+
+  .code-block .ck { color: rgba(147,187,252,0.9); }
+  .code-block .cv { color: rgba(139,233,160,0.9); }
+
+  .chat-messages { display: flex; flex-direction: column; gap: 12px; }
+
+  .chat-msg {
+    font-size: 14px; line-height: 1.55; padding: 10px 14px;
+    border-radius: 12px; max-width: 88%; opacity: 0;
+    transform: translateY(6px); animation: chatIn 0.25s ease forwards;
+  }
+
+  .chat-msg.user {
+    align-self: flex-end; background: rgba(59,130,246,0.22);
+    border: 1px solid rgba(59,130,246,0.25); color: rgba(255,255,255,0.95);
+    border-bottom-right-radius: 4px;
+  }
+
+  .chat-msg.bot {
+    align-self: flex-start; background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.88);
+    border-bottom-left-radius: 4px;
+  }
+
+  .chat-msg .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
+  .chat-msg.user .label { color: rgba(147,187,252,0.6); }
+  .chat-msg.bot .label { color: rgba(139,233,160,0.6); }
+  .chat-msg .body { min-height: 1.55em; }
+
+  .cursor {
+    display: inline-block; width: 2px; height: 1em;
+    background: rgba(255,255,255,0.7); margin-left: 1px;
+    vertical-align: text-bottom; animation: blink 0.6s step-end infinite;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes chatIn { to { opacity: 1; transform: translateY(0); } }
+  @keyframes gradientShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } }
+
+  /* --- Sections --- */
+  .section { padding: 48px 0; width: 100%; max-width: 700px; pointer-events: auto; }
+  .section-label { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #4ade80; background: rgba(74,222,128,0.1); padding: 6px 14px; border-radius: 100px; margin-bottom: 16px; }
+  .section-title { font-size: clamp(1.5rem,3vw,2rem); font-weight: 800; color: #f1f5f9; margin-bottom: 12px; letter-spacing: -0.02em; background: linear-gradient(135deg,#f1f5f9 0%,#4ade80 50%,#22d3ee 100%); background-size: 200% 200%; animation: gradientShift 6s ease infinite; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .section-desc { color: #94a3b8; font-size: 1rem; line-height: 1.7; max-width: 600px; }
+
+  /* --- Tools Grid --- */
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 16px; margin-top: 32px; }
+  .tool-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-left: 3px solid; border-image: linear-gradient(180deg,#4ade80,#22d3ee) 1; border-radius: 14px; padding: 24px; transition: all 0.3s ease; cursor: default; }
+  .tool-card:hover { transform: translateY(-4px); box-shadow: 0 0 0 2px rgba(74,222,128,0.15), 0 12px 40px rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.25); }
+  .tool-icon { font-size: 1.5rem; margin-bottom: 12px; display: block; }
+  .tool-card h3 { font-family: 'SF Mono', Consolas, monospace; color: #4ade80; font-size: 0.9rem; margin-bottom: 8px; font-weight: 700; }
+  .tool-card p { color: #94a3b8; font-size: 0.82rem; line-height: 1.6; }
+
+  .live-dot { display: inline-block; width: 8px; height: 8px; background: #4ade80; border-radius: 50%; margin-right: 6px; animation: livePulse 1.5s ease-in-out infinite; vertical-align: middle; box-shadow: 0 0 8px rgba(74,222,128,0.6); }
 
   /* --- Powered By --- */
-  .powered-card{display:flex;align-items:center;gap:24px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:32px;margin-top:32px;transition:border-color 0.3s}
-  .powered-card:hover{border-color:rgba(74,222,128,0.2)}
-  .powered-icon{font-size:2.5rem;flex-shrink:0}
-  .powered-card h3{font-size:1rem;font-weight:700;color:#f1f5f9;margin-bottom:6px}
-  .powered-card h3 a{color:#4ade80;text-decoration:none;transition:color 0.2s}
-  .powered-card h3 a:hover{color:#22d3ee;text-decoration:underline}
-  .powered-card p{color:#94a3b8;font-size:0.85rem;line-height:1.6}
-  @media(max-width:480px){.powered-card{flex-direction:column;text-align:center}}
+  .powered-card { display: flex; align-items: center; gap: 24px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 32px; margin-top: 32px; transition: border-color 0.3s; }
+  .powered-card:hover { border-color: rgba(74,222,128,0.2); }
+  .powered-icon { font-size: 2.5rem; flex-shrink: 0; }
+  .powered-card h3 { font-size: 1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+  .powered-card h3 a { color: #4ade80; text-decoration: none; transition: color 0.2s; }
+  .powered-card h3 a:hover { color: #22d3ee; text-decoration: underline; }
+  .powered-card p { color: #94a3b8; font-size: 0.85rem; line-height: 1.6; }
 
-  /* --- Footer --- */
-  .footer{border-top:1px solid rgba(255,255,255,0.06);padding:48px 24px;margin-top:32px}
-  .footer-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-  .footer-links{display:flex;gap:24px}
-  .footer-links a{color:#64748b;text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.2s}
-  .footer-links a:hover{color:#4ade80}
-  .footer-built{color:#475569;font-size:0.82rem}
-  .footer-built a{color:#64748b;text-decoration:none;font-weight:500}
-  .footer-built a:hover{color:#4ade80}
-
-  /* --- Shimmer on Hero Stats --- */
-  .hero-stat{position:relative;overflow:hidden}
-  .hero-stat::after{content:'';position:absolute;top:0;left:-200%;width:200%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);animation:shimmer 4s ease-in-out infinite}
-
-  /* --- Gradient Section Titles --- */
-  .section-title{background:linear-gradient(135deg,#f1f5f9 0%,#4ade80 50%,#22d3ee 100%);background-size:200% 200%;animation:gradientShift 6s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-
-  /* --- Animated Gradient Dividers --- */
-  .gradient-divider{height:2px;border:none;margin:0 auto;max-width:200px;background:linear-gradient(90deg,#4ade80,#22d3ee,#a78bfa,#4ade80);background-size:300% 100%;animation:gradientDivider 4s ease infinite;border-radius:2px;opacity:0.5}
-
-  /* --- Tool Card Ring Glow --- */
-  .tool-card:hover{transform:translateY(-4px);box-shadow:0 0 0 2px rgba(74,222,128,0.15),0 12px 40px rgba(74,222,128,0.12);border-color:rgba(74,222,128,0.25)}
-
-  /* --- Live Pulse Dot --- */
-  .live-dot{display:inline-block;width:8px;height:8px;background:#4ade80;border-radius:50%;margin-right:6px;animation:livePulse 1.5s ease-in-out infinite;vertical-align:middle;box-shadow:0 0 8px rgba(74,222,128,0.6)}
-
-  /* --- Get the App Section --- */
-  .app-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:32px}
-  .app-badge{display:inline-flex;align-items:center;gap:12px;padding:14px 28px;border-radius:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);text-decoration:none;color:#e0e6ed;font-weight:600;font-size:0.9rem;transition:all 0.3s ease}
-  .app-badge:hover{transform:translateY(-3px);box-shadow:0 0 0 2px rgba(74,222,128,0.2),0 12px 32px rgba(74,222,128,0.15);border-color:rgba(74,222,128,0.3);background:rgba(255,255,255,0.08)}
-  .app-badge svg{flex-shrink:0}
-  .app-badge-text{display:flex;flex-direction:column;line-height:1.2}
-  .app-badge-small{font-size:0.65rem;font-weight:400;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em}
-  .app-badge-store{font-size:1rem;font-weight:700;color:#fff}
-  .app-tagline{text-align:center;margin-top:20px;color:#94a3b8;font-size:0.9rem;font-style:italic}
-
-  /* --- Examples Chat Bubbles --- */
-  .examples-grid{display:grid;gap:40px;margin-top:32px}
-  .example-item{display:grid;grid-template-columns:1fr 1.4fr;gap:16px;align-items:start}
-  .chat-q,.chat-a{padding:16px 20px;border-radius:16px;font-size:0.88rem;line-height:1.6;position:relative;margin-top:24px}
-  .chat-q{background:linear-gradient(135deg,rgba(74,222,128,0.12),rgba(34,211,238,0.12));border:1px solid rgba(74,222,128,0.2);color:#e0e6ed;border-top-left-radius:4px}
-  .chat-q::before{content:'You';position:absolute;top:-20px;left:0;font-size:0.7rem;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:0.05em}
-  .chat-a{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;border-top-right-radius:4px}
-  .chat-a::before{content:'LiveScore MCP';position:absolute;top:-20px;left:0;font-size:0.7rem;font-weight:600;color:#22d3ee;text-transform:uppercase;letter-spacing:0.05em}
-  .chat-a strong{color:#4ade80;font-weight:700}
-  .chat-a .score{font-family:'SF Mono',Consolas,monospace;color:#22d3ee;font-weight:600}
-  @media(max-width:640px){
-    .examples-grid{gap:24px}
-    .example-item{display:flex;flex-direction:column;gap:4px}
-    .chat-q,.chat-a{font-size:0.82rem;padding:12px 16px;max-width:85%;margin-top:20px}
-    .chat-q{align-self:flex-end;border-top-left-radius:16px;border-top-right-radius:4px;border-bottom-right-radius:4px;text-align:right}
-    .chat-q::before{right:0;left:auto}
-    .chat-a{align-self:flex-start;border-top-left-radius:4px;border-top-right-radius:16px;border-bottom-left-radius:4px}
-    .chat-a::before{content:'MCP';font-size:0.65rem}
-  }
+  /* --- Get the App --- */
+  .app-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 32px; }
+  .app-badge { display: inline-flex; align-items: center; gap: 12px; padding: 14px 28px; border-radius: 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); text-decoration: none; color: #e0e6ed; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
+  .app-badge:hover { transform: translateY(-3px); box-shadow: 0 0 0 2px rgba(74,222,128,0.2), 0 12px 32px rgba(74,222,128,0.15); border-color: rgba(74,222,128,0.3); background: rgba(255,255,255,0.08); }
+  .app-badge svg { flex-shrink: 0; }
+  .app-badge-text { display: flex; flex-direction: column; line-height: 1.2; }
+  .app-badge-small { font-size: 0.65rem; font-weight: 400; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+  .app-badge-store { font-size: 1rem; font-weight: 700; color: #fff; }
+  .app-tagline { text-align: center; margin-top: 20px; color: #94a3b8; font-size: 0.9rem; font-style: italic; }
 
   /* --- Usage Policy --- */
-  .policy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:32px}
-  .policy-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:24px;transition:border-color 0.3s}
-  .policy-card:hover{border-color:rgba(255,255,255,0.12)}
-  .policy-icon{font-size:1.5rem;margin-bottom:12px;display:block}
-  .policy-card h3{font-size:0.95rem;font-weight:700;color:#f1f5f9;margin-bottom:8px}
-  .policy-card p{color:#94a3b8;font-size:0.85rem;line-height:1.7}
-  .policy-card a{color:#4ade80;text-decoration:none;font-weight:600}
-  .policy-card a:hover{text-decoration:underline}
-  .policy-note{margin-top:24px;padding:20px 24px;background:rgba(234,179,8,0.06);border:1px solid rgba(234,179,8,0.15);border-radius:12px;color:#94a3b8;font-size:0.85rem;line-height:1.7}
-  .policy-note strong{color:#eab308}
+  .policy-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap: 16px; margin-top: 32px; }
+  .policy-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 24px; transition: border-color 0.3s; }
+  .policy-card:hover { border-color: rgba(255,255,255,0.12); }
+  .policy-icon { font-size: 1.5rem; margin-bottom: 12px; display: block; }
+  .policy-card h3 { font-size: 0.95rem; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
+  .policy-card p { color: #94a3b8; font-size: 0.85rem; line-height: 1.7; }
+  .policy-card a { color: #4ade80; text-decoration: none; font-weight: 600; }
+  .policy-card a:hover { text-decoration: underline; }
+  .policy-note { margin-top: 24px; padding: 20px 24px; background: rgba(234,179,8,0.06); border: 1px solid rgba(234,179,8,0.15); border-radius: 12px; color: #94a3b8; font-size: 0.85rem; line-height: 1.7; }
+  .policy-note strong { color: #eab308; }
 
-  /* --- Responsive --- */
-  @media(max-width:768px){
-    .nav-links a:not(.nav-gh){display:none}
-    .steps{grid-template-columns:1fr;gap:24px}
-    .steps::before{display:none}
-    .hero{padding:110px 20px 50px;min-height:auto}
-    .hero-stats{gap:8px}
-    .hero-stat{padding:6px 14px;font-size:0.8rem}
-    .tools-grid{grid-template-columns:1fr}
-    .footer-inner{flex-direction:column;text-align:center}
-    .footer-links{justify-content:center;flex-wrap:wrap}
-    .section{padding:48px 0}
-    .section-alt{margin:0 -16px;padding:48px 16px}
-    .connect-box{padding:20px}
-    pre{font-size:0.72rem;padding:16px}
-    .policy-grid{grid-template-columns:1fr}
-    .policy-note{padding:16px}
-    .footer-built{text-align:center;font-size:0.75rem}
+  /* --- Footer --- */
+  .site-footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 48px 24px; pointer-events: auto; width: 100%; max-width: 700px; }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+  .footer-links a { color: #64748b; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+  .footer-links a:hover { color: #4ade80; }
+  .footer-built { color: #475569; font-size: 0.82rem; }
+  .footer-built a { color: #64748b; text-decoration: none; font-weight: 500; }
+  .footer-built a:hover { color: #4ade80; }
+
+  /* --- noscript --- */
+  .noscript-content { max-width: 700px; margin: 60px auto; padding: 0 24px; color: #94a3b8; }
+  .noscript-content h2 { color: #f1f5f9; margin: 24px 0 8px; }
+  .noscript-content p { margin-bottom: 12px; line-height: 1.7; }
+  .noscript-content a { color: #4ade80; }
+  .noscript-content code { color: #22d3ee; background: rgba(34,211,238,0.1); padding: 2px 8px; border-radius: 4px; font-size: 0.9rem; }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    #overlay { padding: 40px 12px 40px; }
+    #title { -webkit-text-stroke: 3px rgba(0,0,0,0.8); }
+    .card { padding: 18px 18px; border-radius: 12px; }
+    #chat-card { height: 240px; }
+    .chat-msg { font-size: 13px; padding: 8px 12px; max-width: 92%; }
+    .step { gap: 10px; }
+    .step-content { font-size: 13px; }
+    .code-block { font-size: 11px; padding: 10px 12px; }
+    .endpoint { font-size: 11px; }
+    .tools-grid { grid-template-columns: 1fr; }
+    .section { padding: 36px 0; }
+    .policy-grid { grid-template-columns: 1fr; }
+    .policy-note { padding: 16px; }
+    .powered-card { flex-direction: column; text-align: center; }
+    .footer-inner { flex-direction: column; text-align: center; }
+    .footer-links { justify-content: center; }
+    .footer-built { text-align: center; font-size: 0.75rem; }
   }
-  @media(max-width:480px){
-    .hero h1{font-size:2rem}
-    .hero-sub{font-size:0.95rem;margin-bottom:24px}
-    .hero-btns{flex-direction:column;align-items:center}
-    .btn{width:100%;justify-content:center}
-    .lang-pills{gap:8px}
-    .app-badges{flex-direction:column;align-items:center}
-    .app-badge{width:100%;justify-content:center}
-    .hero-stats{flex-direction:column;align-items:center;gap:6px}
-    .hero-stat{width:auto}
-    .container{padding:0 16px}
-    .nav{padding:0 16px}
-    .footer{padding:32px 16px}
+
+  @media (max-width: 480px) {
+    #overlay { padding: 24px 8px 30px; }
+    #title { font-size: clamp(32px, 10vw, 56px); -webkit-text-stroke: 2px rgba(0,0,0,0.8); }
+    .card { padding: 14px 14px; max-width: 100%; width: 96%; }
+    #chat-card { height: 200px; margin-top: 20px; }
+    #steps-card { margin-top: 14px; }
+    .chat-msg { font-size: 12px; padding: 7px 10px; }
+    .chat-msg .label { font-size: 9px; }
+    .step-num { width: 24px; height: 24px; font-size: 11px; }
+    .step-content { font-size: 12px; }
+    .code-block { font-size: 10px; padding: 8px 10px; }
+    .app-badges { flex-direction: column; align-items: center; }
+    .app-badge { width: 100%; justify-content: center; }
+    .site-footer { padding: 32px 16px; }
   }
 </style>
 </head>
 <body>
 
-<!-- Nav -->
-<nav class="nav">
-  <a href="#" class="nav-logo"><svg width="24" height="21" viewBox="0 0 159.83 139.7" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M121.35,34.77c-1.38-1.63-3.4-2.57-5.52-2.57h-60.88c-3.39,0-6.3,2.42-6.91,5.75l-11.16,61.01c-.38,2.1.19,4.25,1.57,5.9,1.39,1.66,3.41,2.62,5.56,2.62h61.97c3.46,0,6.37-2.47,6.93-5.87l10.07-61.01c.34-2.08-.25-4.21-1.63-5.83ZM68.74,42.53c5.65-.23,11.13.79,16.34,3.03,5.21,2.24,9.73,5.53,13.44,9.77l.95,1.08-17.51-3.83-14.66-10,1.44-.06ZM57.38,82.64l-.26-.13v-.29c-.12-7.38.16-12.31,1.12-19.57l.04-.32.32-.08c7.55-1.82,12.74-2.71,20.57-3.54l.27-.03.16.21c4.78,6.25,7.7,10.63,11.59,17.36l.16.28-.21.25c-4.6,5.68-7.98,9.29-13.42,14.28l-.21.19-.27-.1c-7.62-2.74-12.63-4.89-19.87-8.54ZM46.86,49.79c4.27-3.22,9.27-5.53,14.84-6.52l-.03.36c-2.03.59-3.97,1.37-5.83,2.3l-5.56,12.35-5.64,3.71,2.23-12.19ZM37.83,99.13l2.43-13.28,5.92,4.34,2.32,16.31h-4.5c-3.89,0-6.87-3.56-6.17-7.37ZM99.23,106.5h-23.11l5.03-4.72,13.13,2.52c1.67-1.54,3.21-3.27,4.57-5.2,1.33-1.84,2.46-3.8,3.42-5.83l-2.45-13.71,5.41-13.23.42,1.17c.22.61.38,1.23.56,1.84,4.6,12.1,1.81,26.93-6.98,37.15Z" fill="#fff"/></svg> LiveScore MCP</a>
-  <div class="nav-links">
-    <a href="#how-it-works">How It Works</a>
-    <a href="#examples">Examples</a>
-    <a href="#connect">Connect</a>
-    <a href="#tools">Tools</a>
-    <a href="#faq">FAQ</a>
-    <a href="#get-app">App</a>
-    <a href="https://github.com/holoduke/livescore-mcp" class="nav-gh" target="_blank" rel="noopener">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-      GitHub
-    </a>
-  </div>
-</nav>
+<div id="overlay">
+  <h1 id="title">Football<br>Livescore MCP</h1>
 
-<!-- Hero -->
-<header class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-orb hero-orb-1"></div>
-  <div class="hero-orb hero-orb-2"></div>
-  <div class="hero-orb hero-orb-3"></div>
-  <h1 class="fade-in fade-in-1">LiveScore MCP</h1>
-  <p class="hero-sub fade-in fade-in-2">Real-time football scores, fixtures, team &amp; player data for AI agents via the Model Context Protocol</p>
-  <div class="hero-stats fade-in fade-in-3">
-    <span class="hero-stat"><em>1000+</em> Leagues</span>
-    <span class="hero-stat"><em>10</em> Tools</span>
-    <span class="hero-stat"><span class="live-dot"></span><em>SSE</em> Transport</span>
-    <span class="hero-stat"><em>8+</em> Languages</span>
+  <div class="card" id="chat-card" aria-label="Live demo of AI football queries">
+    <div class="chat-messages" id="chat"></div>
   </div>
-  <div class="hero-btns fade-in fade-in-4">
-    <a href="#connect" class="btn btn-primary">Get Started</a>
-    <a href="https://github.com/holoduke/livescore-mcp" class="btn btn-secondary" target="_blank" rel="noopener">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-      View on GitHub
-    </a>
-  </div>
-</header>
 
-<main class="container">
-
-  <!-- How It Works -->
-  <section class="section fade-in fade-in-2" id="how-it-works">
-    <span class="section-label">Quick Start</span>
-    <h2 class="section-title">How It Works</h2>
-    <p class="section-desc">Connect any MCP-compatible AI client to live football data in three simple steps.</p>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h3>Copy the Endpoint</h3>
-        <p>Use the SSE endpoint URL to connect your AI client to the LiveScore MCP server</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h3>Configure Your Client</h3>
-        <p>Add the endpoint to Claude Desktop, Cursor, Claude Code, or any MCP-compatible client</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h3>Query Live Data</h3>
-        <p>Ask your AI for live scores, fixtures, team stats, player profiles, and more</p>
+  <div class="card" id="steps-card">
+    <h3>Get Started</h3>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Connect your MCP client</strong> to the SSE endpoint:
+        <div class="endpoint">https://livescoremcp.com/sse</div>
       </div>
     </div>
-  </section>
-
-
-  <!-- Examples -->
-  <section class="section section-alt fade-in fade-in-3" id="examples">
-    <span class="section-label">In Action</span>
-    <h2 class="section-title">Example Queries</h2>
-    <p class="section-desc">See what you can ask your AI agent when connected to LiveScore MCP.</p>
-    <div class="examples-grid">
-      <div class="example-item">
-        <div class="chat-q">What are the live scores right now?</div>
-        <div class="chat-a"><strong>Premier League</strong><br>Arsenal <span class="score">2 - 1</span> Chelsea &bull; 67'<br>Liverpool <span class="score">0 - 0</span> Man City &bull; 34'<br><br><strong>La Liga</strong><br>Real Madrid <span class="score">3 - 0</span> Getafe &bull; FT<br><em style="color:#64748b;font-size:0.8rem">Showing 3 of 12 live matches</em></div>
-      </div>
-      <div class="example-item">
-        <div class="chat-q">Search for Feyenoord and show me their squad</div>
-        <div class="chat-a"><strong>Feyenoord Rotterdam</strong> &bull; Eredivisie<br>Stadium: De Kuip (47,000)<br>Coach: Brian Priske<br><br><strong>Key Players:</strong><br>Santiago Gimenez &bull; Forward &bull; #29<br>Igor Paixao &bull; Winger &bull; #11<br>Justin Bijlow &bull; Goalkeeper &bull; #1<br><em style="color:#64748b;font-size:0.8rem">+ 22 more players</em></div>
-      </div>
-      <div class="example-item">
-        <div class="chat-q">Get me all Champions League fixtures</div>
-        <div class="chat-a"><strong>UEFA Champions League 2025/26</strong><br><br>Round of 16 &bull; 1st Leg:<br>Barcelona <span class="score">vs</span> PSG &bull; Mar 4<br>Bayern Munich <span class="score">vs</span> Inter Milan &bull; Mar 4<br>Real Madrid <span class="score">vs</span> Man City &bull; Mar 5<br>Liverpool <span class="score">vs</span> Juventus &bull; Mar 5<br><em style="color:#64748b;font-size:0.8rem">+ 4 more fixtures</em></div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- Connect -->
-  <section class="section fade-in fade-in-3" id="connect">
-    <span class="section-label">Setup</span>
-    <h2 class="section-title">Connect to LiveScore MCP</h2>
-    <p class="section-desc">Get started in seconds. Just point your MCP client to our SSE endpoint.</p>
-    <div class="connect-grid">
-      <div class="connect-box">
-        <h3>SSE Endpoint</h3>
-        <p>Connect any MCP client to: <span class="endpoint-url">https://livescoremcp.com/sse</span></p>
-      </div>
-      <div class="connect-box">
-        <h3>Claude Desktop / claude_desktop_config.json</h3>
-        <div class="code-wrap">
-          <button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('pre').textContent).then(function(){event.target.textContent='Copied!'});setTimeout(function(){document.querySelectorAll('.copy-btn').forEach(function(b){b.textContent='Copy'})},2000)">Copy</button>
-          <pre>{
-  <span class="code-key">"mcpServers"</span>: {
-    <span class="code-key">"livescore"</span>: {
-      <span class="code-key">"url"</span>: <span class="code-val">"https://livescoremcp.com/sse"</span>
-    }
-  }
-}</pre>
-        </div>
-      </div>
-      <div class="connect-box">
-        <h3>Health Check</h3>
-        <div class="code-wrap">
-          <button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('pre').textContent).then(function(){event.target.textContent='Copied!'});setTimeout(function(){document.querySelectorAll('.copy-btn').forEach(function(b){b.textContent='Copy'})},2000)">Copy</button>
-          <pre>curl https://livescoremcp.com/health</pre>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Add to Claude Desktop</strong> &mdash; edit your config file:
+        <div class="code-block">
+{<br>
+&nbsp;&nbsp;<span class="ck">"mcpServers"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="ck">"livescore"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ck">"url"</span>: <span class="cv">"https://livescoremcp.com/sse"</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}<br>
+}
         </div>
       </div>
     </div>
-  </section>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Start asking!</strong> Live scores, fixtures, team stats, player data &mdash; 1000+ leagues worldwide, all free.
+      </div>
+    </div>
+  </div>
 
-
-  <!-- Tools -->
-  <section class="section section-alt fade-in fade-in-3 tools-section" id="tools">
+  <!-- Capabilities -->
+  <section class="section" id="tools">
     <span class="section-label">Capabilities</span>
     <h2 class="section-title">Available Football Data Tools</h2>
     <p class="section-desc">10 powerful tools to access real-time football data from leagues worldwide.</p>
@@ -791,33 +716,8 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
-
-  <!-- Languages -->
-  <section class="section fade-in fade-in-4" id="languages">
-    <span class="section-label">Global</span>
-    <h2 class="section-title">Multi-Language Support</h2>
-    <p class="section-desc">All tools accept a <code style="color:#22d3ee;background:rgba(34,211,238,0.1);padding:2px 8px;border-radius:4px;font-size:0.85rem">language</code> parameter. Get results in your preferred language. All timestamps are in GMT/UTC.</p>
-    <div class="lang-pills">
-      <span class="lang-pill"><span class="lang-flag">&#127468;&#127463;</span> English <span class="lang-code">en</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127475;&#127473;</span> Dutch <span class="lang-code">nl</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127465;&#127466;</span> German <span class="lang-code">de</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127467;&#127479;</span> French <span class="lang-code">fr</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127466;&#127480;</span> Spanish <span class="lang-code">es</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127477;&#127481;</span> Portuguese <span class="lang-code">pt</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127470;&#127481;</span> Italian <span class="lang-code">it</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127479;&#127482;</span> Russian <span class="lang-code">ru</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127480;&#127462;</span> Arabic <span class="lang-code">ar</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127465;&#127472;</span> Danish <span class="lang-code">da</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127482;&#127462;</span> Ukrainian <span class="lang-code">uk</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127483;&#127475;</span> Vietnamese <span class="lang-code">vi</span></span>
-      <span class="lang-pill"><span class="lang-flag">&#127472;&#127479;</span> Korean <span class="lang-code">ko</span></span>
-      <span class="lang-pill" style="color:#64748b;border-style:dashed">+ more</span>
-    </div>
-  </section>
-
-
   <!-- Powered By -->
-  <section class="section section-alt fade-in fade-in-4" id="powered-by">
+  <section class="section" id="powered-by">
     <span class="section-label">Data Source</span>
     <h2 class="section-title">Powered By</h2>
     <p class="section-desc">LiveScore MCP is built on top of comprehensive football data.</p>
@@ -830,9 +730,8 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
-
   <!-- Get the App -->
-  <section class="section fade-in fade-in-4" id="get-app" style="text-align:center">
+  <section class="section" id="get-app" style="text-align:center">
     <span class="section-label">Mobile App</span>
     <h2 class="section-title">Get the App</h2>
     <p class="section-desc" style="margin:0 auto 8px">Download Football Mania for live scores on the go.</p>
@@ -849,9 +748,8 @@ const landingHTML = `<!DOCTYPE html>
     <p class="app-tagline">Your home for live football &mdash; powered by football-mania.com</p>
   </section>
 
-
   <!-- Usage Policy -->
-  <section class="section section-alt fade-in fade-in-4" id="usage-policy">
+  <section class="section" id="usage-policy">
     <span class="section-label">Fair Use</span>
     <h2 class="section-title">Usage Policy</h2>
     <p class="section-desc">LiveScore MCP is free for personal and non-commercial use. Please respect the following guidelines.</p>
@@ -877,51 +775,300 @@ const landingHTML = `<!DOCTYPE html>
     </div>
   </section>
 
-
-  <!-- FAQ -->
-  <section class="section fade-in fade-in-5" id="faq">
-    <span class="section-label">Support</span>
-    <h2 class="section-title">Frequently Asked Questions</h2>
-    <div class="faq-list">
-      <details class="faq-item">
-        <summary>What is LiveScore MCP?</summary>
-        <div class="faq-answer">LiveScore MCP is a free Model Context Protocol (MCP) server that provides real-time football live scores, fixtures, team statistics, player data, and match details. It connects AI agents like Claude, Cursor, and other MCP-compatible clients to comprehensive football data from 1000+ leagues worldwide.</div>
-      </details>
-      <details class="faq-item">
-        <summary>How do I connect to LiveScore MCP?</summary>
-        <div class="faq-answer">Connect any MCP client to the SSE endpoint at <strong>https://livescoremcp.com/sse</strong>. For Claude Desktop, add the URL to your claude_desktop_config.json under mcpServers. For Cursor and other IDE-based clients, configure the SSE URL in your MCP settings.</div>
-      </details>
-      <details class="faq-item">
-        <summary>Is LiveScore MCP free to use?</summary>
-        <div class="faq-answer">Yes, LiveScore MCP is free for personal and non-commercial use. The source code is available on <a href="https://github.com/holoduke/livescore-mcp">GitHub</a>. Rate limits apply to ensure fair access for all users. For commercial use or higher rate limits, please contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</div>
-      </details>
-      <details class="faq-item">
-        <summary>What leagues and competitions are supported?</summary>
-        <div class="faq-answer">LiveScore MCP covers 1000+ football leagues and competitions worldwide, including the Premier League, La Liga, Serie A, Bundesliga, Eredivisie, Ligue 1, Champions League, Europa League, World Cup, and many more domestic and international tournaments.</div>
-      </details>
-      <details class="faq-item">
-        <summary>What MCP clients work with LiveScore MCP?</summary>
-        <div class="faq-answer">LiveScore MCP uses the SSE (Server-Sent Events) transport and works with any MCP-compatible client, including Claude Desktop, Claude Code, Cursor, Windsurf, Cline, and any other tool that supports the Model Context Protocol over SSE.</div>
-      </details>
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="https://github.com/holoduke/livescore-mcp">GitHub</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+      </div>
+      <div class="footer-built">Powered by <a href="https://football-mania.com" target="_blank" rel="noopener noreferrer">football-mania.com</a> &bull; Built with <a href="https://github.com/mark3labs/mcp-go" target="_blank" rel="noopener noreferrer">mcp-go</a> &bull; <a href="https://github.com/holoduke/livescore-mcp" target="_blank" rel="noopener noreferrer">Source on GitHub</a></div>
     </div>
-  </section>
+  </footer>
+</div>
 
-</main>
+<div id="grid-container" aria-hidden="true"></div>
 
-<!-- Footer -->
-<footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-links">
-      <a href="https://github.com/holoduke/livescore-mcp">GitHub</a>
-      <a href="#connect">Get Started</a>
-      <a href="#tools">Tools</a>
-      <a href="#faq">FAQ</a>
-      <a href="/privacy">Privacy Policy</a>
-      <a href="/terms">Terms of Service</a>
-    </div>
-    <div class="footer-built">Powered by <a href="https://football-mania.com" target="_blank" rel="noopener noreferrer">football-mania.com</a> &bull; Built with <a href="https://github.com/mark3labs/mcp-go" target="_blank" rel="noopener noreferrer">mcp-go</a> &bull; <a href="https://github.com/holoduke/livescore-mcp" target="_blank" rel="noopener noreferrer">Source on GitHub</a></div>
-  </div>
-</footer>
+<!-- SEO: Noscript fallback with key content for crawlers -->
+<noscript>
+<div class="noscript-content">
+  <h2>LiveScore MCP - Football Live Scores for AI Agents</h2>
+  <p>LiveScore MCP is a free Model Context Protocol (MCP) server providing real-time football live scores, fixtures, team statistics, player data, and match details from 1000+ leagues worldwide.</p>
+  <p>Connect any MCP-compatible AI client (Claude Desktop, Claude Code, Cursor, Windsurf, Cline) to the SSE endpoint at <code>https://livescoremcp.com/sse</code></p>
+  <h2>Available Tools</h2>
+  <p>get_live_scores, get_fixtures, search, get_league_fixtures, get_team, get_player, get_match, get_day_fixtures, get_team_image, health</p>
+  <h2>Links</h2>
+  <p><a href="https://github.com/holoduke/livescore-mcp">GitHub Repository</a> | <a href="https://football-mania.com">Powered by football-mania.com</a></p>
+</div>
+</noscript>
+
+<script>
+var container = document.getElementById('grid-container');
+var CELL_UNIT = 80;
+var MIN_SPAN = 1;
+var MAX_SPAN = 5;
+var TOTAL_ROWS = 80;
+
+var images = [
+  'academy-drill','acrobatic-celebration','aerial-night-city','ajax-cruyff-turn',
+  'ajax-youth-goal','anfield-roar','arsenal-goal-celebration','arsenal-passing',
+  'atletico-grit','away-fans','baby-celebration','ball-closeup','ball-net',
+  'ball-rain','barca-goal-camp-nou','barca-tiki-taka','bayern-header',
+  'bayern-pressing','benfica-eagle','bicycle-kick','boots-hanging-wire',
+  'boots-pitch','celebration-knee','celtic-park-roar','champions-trophy',
+  'chip-goal','city-possession','city-title-win','coach-tactics','corner-flag',
+  'corner-kick','crowd-mosaic','dortmund-counter-goal','dortmund-yellow-wall',
+  'dressing-room','dribble-skill','empty-stadium-dawn','fan-tears-joy',
+  'fans-celebrating','feyenoord-de-kuip','finger-lips','floodlight-tower',
+  'fog-stadium','formation-board','free-kick','gloves-grip','goal-line-tech',
+  'goalkeeper-dive','grass-dew-morning','grass-divot','handshake-line',
+  'header-goal','injury-time-goal','inter-derby-goal','juve-defensive',
+  'juve-freekick-goal','keeper-punch','keeper-throw','keeper-wall','kid-fan',
+  'kids-match','last-man-tackle','liverpool-counter-press','long-range-strike',
+  'madrid-champions','madrid-counter','manager-touchline','matchday-program',
+  'medal-ceremony','milan-celebration-corner','milan-san-siro','napoli-maradona',
+  'net-texture','offside-line','old-boots','park-kickabout','penalty-kick',
+  'pitch-invasion','pitch-lines','pitch-mowing','players-tunnel-lineup',
+  'porto-dragao','pressing-trigger','psg-attack-trio','psg-skill-move',
+  'rain-puddle','red-card','scoreboard-classic','shadow-player','shin-guards',
+  'shirt-off','slide-tackle','snow-match','spotlight-player','stadium-aerial',
+  'stadium-fireworks','stadium-night','striker-volley','substitution-board',
+  'sunday-league','sunset-warmup','team-huddle','tears-defeat','through-ball',
+  'training-session','trophy-room','tunnel-walkout','turnstile','ultras-smoke',
+  'var-screen','wall-block','warmup-rondo','world-cup-lift'
+];
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function generateGrid() {
+  var viewportWidth = window.innerWidth;
+  var cols = Math.floor(viewportWidth / CELL_UNIT);
+  lastCols = cols;
+
+  container.style.gridTemplateColumns = 'repeat(' + cols + ', ' + CELL_UNIT + 'px)';
+  container.style.gridAutoRows = CELL_UNIT + 'px';
+  container.innerHTML = '';
+
+  var occupied = {};
+  var cellImageMap = {};
+
+  function isOcc(row, col, s) {
+    for (var r = row; r < row + s; r++)
+      for (var c = col; c < col + s; c++)
+        if (c >= cols || occupied[r + ',' + c]) return true;
+    return false;
+  }
+
+  function markOcc(row, col, s, idx) {
+    for (var r = row; r < row + s; r++)
+      for (var c = col; c < col + s; c++) {
+        occupied[r + ',' + c] = true;
+        cellImageMap[r + ',' + c] = idx;
+      }
+  }
+
+  function getNeighborImages(row, col, span) {
+    var used = {};
+    for (var r = row - 1; r <= row + span; r++)
+      for (var c = col - 1; c <= col + span; c++) {
+        if (r >= row && r < row + span && c >= col && c < col + span) continue;
+        var key = r + ',' + c;
+        if (cellImageMap[key] !== undefined) used[cellImageMap[key]] = true;
+      }
+    return used;
+  }
+
+  function pickImage(row, col, span) {
+    var neighborImgs = getNeighborImages(row, col, span);
+    var candidates = [];
+    for (var i = 0; i < images.length; i++)
+      if (!neighborImgs[i]) candidates.push(i);
+    if (candidates.length === 0) return Math.floor(Math.random() * images.length);
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+
+  var cells = [];
+  for (var row = 0; row < TOTAL_ROWS; row++) {
+    for (var col = 0; col < cols; col++) {
+      if (occupied[row + ',' + col]) continue;
+      var maxS = Math.min(MAX_SPAN, cols - col, TOTAL_ROWS - row);
+      var span;
+      var rnd = Math.random();
+      if (rnd < 0.15) span = 1;
+      else if (rnd < 0.4) span = 2;
+      else if (rnd < 0.65) span = 3;
+      else if (rnd < 0.85) span = 4;
+      else span = 5;
+      span = Math.min(span, maxS);
+      while (span > 1 && isOcc(row, col, span)) span--;
+      if (isOcc(row, col, span)) continue;
+      var imgIdx = pickImage(row, col, span);
+      markOcc(row, col, span, imgIdx);
+      cells.push({ row: row + 1, col: col + 1, span: span, image: '/static/grid/' + images[imgIdx] + '.png' });
+    }
+  }
+
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < cells.length; i++) {
+    var cell = cells[i];
+    var div = document.createElement('div');
+    div.className = 'grid-cell';
+    div.style.gridRow = cell.row + ' / span ' + cell.span;
+    div.style.gridColumn = cell.col + ' / span ' + cell.span;
+    div.style.backgroundImage = 'url(' + cell.image + ')';
+    fragment.appendChild(div);
+  }
+  container.appendChild(fragment);
+}
+
+var lastCols = 0;
+generateGrid();
+
+var resizeTimer;
+window.addEventListener('resize', function() {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(function() {
+    var newCols = Math.floor(window.innerWidth / CELL_UNIT);
+    if (newCols !== lastCols) generateGrid();
+  }, 300);
+});
+
+// Chat simulation
+var chatEl = document.getElementById('chat');
+var chatCard = document.getElementById('chat-card');
+
+var presets = [
+  { q: 'How is Barcelona doing this week?', a: 'Barcelona had a fantastic week! They won 1-2 away at Real Madrid on Saturday \u2014 Lewandowski opened the scoring in the 23rd minute and Lamine Yamal sealed it with a curler in the 78th. They also beat Villarreal 3-0 midweek.' },
+  { q: 'What are the live scores right now?', a: 'There are 14 matches currently in play. Manchester City leads Arsenal 2-1 (67\'), Bayern Munich and Dortmund are tied 1-1 (54\'), and Napoli is beating Juventus 3-0 (72\'). PSG vs Lyon just kicked off.' },
+  { q: 'Who scored in the Champions League tonight?', a: 'Big night in the Champions League! Haaland scored a hat-trick for City vs PSG, Mbapp\u00e9 got two for Madrid against Atletico, Saka netted a brilliant free kick for Arsenal, and Musiala scored the winner for Bayern in the 89th minute.' },
+  { q: 'Show me the Premier League table', a: 'The current Premier League standings: 1. Arsenal \u2014 58 pts, 2. Liverpool \u2014 55 pts, 3. Man City \u2014 53 pts, 4. Aston Villa \u2014 46 pts, 5. Tottenham \u2014 44 pts. Arsenal lead on goal difference after their win over Chelsea yesterday.' },
+  { q: 'Any red cards today?', a: 'Two red cards so far today. Bruno Fernandes received a straight red in the 34th minute for a studs-up challenge on Rice during Man United vs Arsenal. Also Gvardiol got a second yellow in the 78th for pulling back Salah in City vs Liverpool.' },
+  { q: 'What matches are on this Saturday?', a: 'Packed Saturday coming up! Premier League: Arsenal vs Chelsea (12:30), Man City vs Liverpool (17:30). La Liga: Barcelona vs Atletico (16:15). Serie A: AC Milan vs Inter (18:00). Bundesliga: Bayern vs Dortmund (18:30). Plus 23 more matches across Europe.' },
+  { q: 'Tell me about Ajax\'s squad', a: 'Ajax\'s current squad features captain Steven Berghuis in midfield, Kenneth Taylor as the creative engine, and Brian Brobbey leading the attack. In defense, Josip Sutalo anchors the backline. Key youngsters include Jorrel Hato (17) at left-back and Mika Godts on the wing.' },
+  { q: 'How did the Eredivisie matchday go?', a: 'Eredivisie Matchday 24 results: PSV 4-0 Twente (dominant), Feyenoord 2-1 AZ (Gimenez winner), Ajax 3-1 Utrecht (Brobbey brace), NEC 0-0 Heerenveen. PSV extend their lead to 8 points at the top. Ajax move into third.' },
+  { q: 'Who is the top scorer in La Liga?', a: 'La Liga top scorers this season: 1. Robert Lewandowski (Barcelona) \u2014 18 goals, 2. Vin\u00edcius Jr (Real Madrid) \u2014 14 goals, 3. Antoine Griezmann (Atletico) \u2014 13 goals, 4. Ayoze P\u00e9rez (Villarreal) \u2014 11 goals, 5. Lamine Yamal (Barcelona) \u2014 10 goals.' },
+  { q: 'What happened in the Manchester derby?', a: 'What a derby! Manchester City beat United 3-1 at Old Trafford. Haaland scored twice in the first half, Foden added a third after the break. Rashford pulled one back in stoppage time but it was too little too late. City dominated possession with 68%.' },
+  { q: 'Give me head-to-head stats for Milan vs Inter', a: 'AC Milan vs Inter Milan \u2014 last 10 meetings: Inter have won 5, Milan 3, with 2 draws. Inter have scored 18 goals to Milan\'s 12 in those matches. Last meeting: Inter 1-2 Milan (Le\u00e3o brace). The Derby della Madonnina is this Sunday at San Siro.' },
+  { q: 'Any upsets in the Champions League this week?', a: 'Massive upsets this week! Club Brugge knocked out PSG 4-2 on aggregate, Feyenoord beat Bayern Munich 3-1 in Munich, and Celtic held Real Madrid to a 0-0 draw at the Bernab\u00e9u. The standout was Brugge\'s incredible second-half comeback from 2-0 down.' },
+  { q: 'What\'s the score in the Liverpool game?', a: 'Liverpool 2-0 Everton (62nd minute). Salah opened the scoring with a penalty in the 15th minute after a handball by Tarkowski. D\u00edaz doubled the lead with a fantastic solo run and finish in the 51st. Liverpool looking comfortable in the Merseyside derby.' },
+  { q: 'Show me tomorrow\'s fixtures', a: 'Tomorrow\'s highlights: Serie A \u2014 Roma vs Lazio (Derby della Capitale, 15:00), Napoli vs Atalanta (18:00). Ligue 1 \u2014 PSG vs Marseille (Le Classique, 20:45). La Liga \u2014 Real Sociedad vs Athletic Bilbao (Basque derby, 16:15). Plus 18 more matches.' },
+  { q: 'Who got injured in the Arsenal game?', a: 'Bad news for Arsenal \u2014 Bukayo Saka went down holding his hamstring in the 63rd minute and was substituted for Trossard. Early reports suggest it could be a Grade 2 strain, potentially ruling him out for 4-6 weeks. Martin \u00d8degaard also took a knock but played on.' },
+  { q: 'How is Napoli doing in Serie A?', a: 'Napoli are flying! Currently 2nd in Serie A, just 3 points behind Inter. They\'ve won 8 of their last 10 matches, with Kvara and Osimhen combining for 24 goals. Their defense has been the best in the league \u2014 only 18 goals conceded in 26 matches.' },
+  { q: 'What are the Europa League results?', a: 'Europa League Round of 16 results: Roma 2-1 Benfica, West Ham 0-3 Leverkusen, Atalanta 4-0 Sporting CP, Marseille 1-1 Brighton. Leverkusen look unstoppable with their 28-match unbeaten run extending. Atalanta\'s Lookman scored a hat-trick.' },
+  { q: 'Tell me about the World Cup qualifiers', a: 'World Cup 2026 qualifying update \u2014 Europe: France leads Group B with 16 pts, Netherlands top Group D with 14 pts, England struggling in 2nd in Group C behind Serbia. South America: Argentina 1st with 21 pts, Colombia 2nd. Next matchday is in March.' },
+  { q: 'How did the cup final go?', a: 'The League Cup final was a thriller! Chelsea beat Liverpool 2-1 at Wembley. Palmer gave Chelsea the lead from the spot, Salah equalized in the 67th, but Jackson scored an absolute screamer from 25 yards in the 84th minute to win it. Chelsea\'s first trophy in 2 years.' },
+  { q: 'What\'s new with transfers?', a: 'Transfer window heating up! Victor Osimhen is in advanced talks with PSG for a \u20ac120M move. Arsenal are closing in on Florian Wirtz from Leverkusen. Manchester United have bid \u20ac75M for Joao Neves from Benfica. Barcelona are trying to sign Joshua Kimmich on a free.' }
+];
+
+function shuffleArray(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+}
+var presetQueue = presets.slice();
+shuffleArray(presetQueue);
+var queueIdx = 0;
+
+function getNextPreset() {
+  if (queueIdx >= presetQueue.length) {
+    presetQueue = presets.slice();
+    shuffleArray(presetQueue);
+    queueIdx = 0;
+  }
+  return presetQueue[queueIdx++];
+}
+
+function createBubble(role) {
+  var div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  var label = document.createElement('div');
+  label.className = 'label';
+  label.textContent = role === 'user' ? 'You' : 'LiveScore MCP';
+  div.appendChild(label);
+  var body = document.createElement('div');
+  body.className = 'body';
+  div.appendChild(body);
+  chatEl.appendChild(div);
+  chatCard.scrollTop = chatCard.scrollHeight;
+  return body;
+}
+
+function streamText(el, text, speed) {
+  return new Promise(function(resolve) {
+    var words = text.split(' ');
+    var i = 0;
+    var cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    el.appendChild(cursor);
+    function tick() {
+      if (i < words.length) {
+        if (i > 0) el.insertBefore(document.createTextNode(' '), cursor);
+        el.insertBefore(document.createTextNode(words[i]), cursor);
+        i++;
+        chatCard.scrollTop = chatCard.scrollHeight;
+        var jitter = speed + Math.random() * 30 - 15;
+        setTimeout(tick, Math.max(15, jitter));
+      } else {
+        cursor.remove();
+        resolve();
+      }
+    }
+    tick();
+  });
+}
+
+function typeUser(el, text) {
+  return new Promise(function(resolve) {
+    var chars = text.split('');
+    var i = 0;
+    var cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    el.appendChild(cursor);
+    function tick() {
+      if (i < chars.length) {
+        el.insertBefore(document.createTextNode(chars[i]), cursor);
+        i++;
+        chatCard.scrollTop = chatCard.scrollHeight;
+        setTimeout(tick, 25 + Math.random() * 25);
+      } else {
+        cursor.remove();
+        resolve();
+      }
+    }
+    tick();
+  });
+}
+
+async function runChat() {
+  while (true) {
+    var preset = getNextPreset();
+    var userBody = createBubble('user');
+    await typeUser(userBody, preset.q);
+    await new Promise(function(r) { setTimeout(r, 600 + Math.random() * 400); });
+    var botBody = createBubble('bot');
+    await streamText(botBody, preset.a, 35);
+    await new Promise(function(r) { setTimeout(r, 3000); });
+    chatEl.style.transition = 'opacity 0.4s';
+    chatEl.style.opacity = '0';
+    await new Promise(function(r) { setTimeout(r, 450); });
+    chatEl.innerHTML = '';
+    chatEl.style.opacity = '1';
+    await new Promise(function(r) { setTimeout(r, 300); });
+  }
+}
+
+setTimeout(runChat, 800);
+</script>
+
 </body>
 </html>`
 
