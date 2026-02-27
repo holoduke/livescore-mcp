@@ -387,10 +387,26 @@ const landingHTML = `<!DOCTYPE html>
     background-position: center;
   }
 
+  .grid-cell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,200,0.03) 2px, rgba(0,255,200,0.03) 4px),
+      linear-gradient(160deg, rgba(0,30,60,0.55) 0%, rgba(0,15,30,0.45) 50%, rgba(0,40,50,0.5) 100%);
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+  }
+
   .grid-cell:hover {
     filter: brightness(1.3);
     z-index: 10;
     transform: scale(1.02);
+  }
+
+  .grid-cell:hover::after {
+    opacity: 0.4;
   }
 
   /* Content overlay */
