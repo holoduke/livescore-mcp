@@ -410,8 +410,8 @@ const landingHTML = `<!DOCTYPE html>
   }
 
   .grid-cell.pulse {
-    filter: brightness(1.4);
-    transform: scale(1.04);
+    filter: brightness(1.6);
+    transform: scale(1.02);
     z-index: 5;
   }
 
