@@ -1220,7 +1220,7 @@ async function runChat() {
     await new Promise(function(r) { setTimeout(r, 600 + Math.random() * 400); });
     var botBody = createBubble('bot');
     await streamText(botBody, preset.a, 35);
-    await new Promise(function(r) { setTimeout(r, 3000); });
+    await new Promise(function(r) { setTimeout(r, 2000); });
     chatEl.style.transition = 'opacity 0.4s';
     chatEl.style.opacity = '0';
     await new Promise(function(r) { setTimeout(r, 450); });
@@ -1230,7 +1230,7 @@ async function runChat() {
   }
 }
 
-setTimeout(runChat, 800);
+setTimeout(runChat, 200);
 </script>
 
 </body>
