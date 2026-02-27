@@ -1,0 +1,21 @@
+name: Deploy to Coolify
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Coolify
+
+    steps:
+      - name: Trigger Coolify Deployment
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}
+        run: |
+          curl -s -X GET "http://46.224.74.85:8000/api/v1/applications/${COOLIFY_APP_UUID}/restart" \
+            -H "Authorization: Bearer ${COOLIFY_TOKEN}"
