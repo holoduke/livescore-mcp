@@ -986,7 +986,7 @@ function pulseRandomCell() {
     this.classList.remove('pulse');
   }, { once: true });
 }
-setInterval(pulseRandomCell, 1000);
+setInterval(pulseRandomCell, 100);
 
 var resizeTimer;
 window.addEventListener('resize', function() {
