@@ -515,8 +515,7 @@ const landingHTML = `<!DOCTYPE html>
   @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } }
 
   /* --- Sections --- */
-  .section { align-self: stretch; max-width: none; width: auto; padding: 56px max(24px, calc(50% - 350px)); pointer-events: auto; background: rgba(6,8,15,0.96); border-top: 1px solid rgba(255,255,255,0.06); }
-  .section-alt { background: rgba(10,14,24,0.97); }
+  .section { max-width: 780px; width: 92%; padding: 40px 28px 48px; margin-top: 20px; pointer-events: auto; background: rgba(0,0,0,0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; }
   .section-label { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #4ade80; background: rgba(74,222,128,0.1); padding: 6px 14px; border-radius: 100px; margin-bottom: 16px; }
   .section-title { font-size: clamp(1.5rem,3vw,2rem); font-weight: 800; color: #f1f5f9; margin-bottom: 12px; letter-spacing: -0.02em; background: linear-gradient(135deg,#f1f5f9 0%,#4ade80 50%,#22d3ee 100%); background-size: 200% 200%; animation: gradientShift 6s ease infinite; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   .section-desc { color: #94a3b8; font-size: 1rem; line-height: 1.7; max-width: 600px; }
@@ -563,7 +562,7 @@ const landingHTML = `<!DOCTYPE html>
   .policy-note strong { color: #eab308; }
 
   /* --- Footer --- */
-  .site-footer { align-self: stretch; max-width: none; width: auto; border-top: 1px solid rgba(255,255,255,0.06); padding: 48px max(24px, calc(50% - 350px)); pointer-events: auto; background: rgba(4,6,12,0.97); }
+  .site-footer { max-width: 780px; width: 92%; border-radius: 16px; padding: 40px 28px; pointer-events: auto; background: rgba(0,0,0,0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.12); margin-bottom: 40px; }
   .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
   .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
   .footer-links a { color: #64748b; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
@@ -591,14 +590,15 @@ const landingHTML = `<!DOCTYPE html>
     .code-block { font-size: 11px; padding: 10px 12px; }
     .endpoint { font-size: 11px; }
     .tools-grid { grid-template-columns: 1fr; }
-    .section { padding: 40px 20px; }
+    .section { padding: 32px 20px 40px; }
+    .section, .site-footer { width: 96%; }
     .policy-grid { grid-template-columns: 1fr; }
     .policy-note { padding: 16px; }
     .powered-card { flex-direction: column; text-align: center; }
     .footer-inner { flex-direction: column; text-align: center; }
     .footer-links { justify-content: center; }
     .footer-built { text-align: center; font-size: 0.75rem; }
-    .site-footer { padding: 40px 20px; }
+    .site-footer { padding: 32px 20px; }
   }
 
   @media (max-width: 480px) {
@@ -612,10 +612,11 @@ const landingHTML = `<!DOCTYPE html>
     .step-num { width: 24px; height: 24px; font-size: 11px; }
     .step-content { font-size: 12px; }
     .code-block { font-size: 10px; padding: 8px 10px; }
-    .section { padding: 32px 16px; }
+    .section { padding: 24px 16px 32px; }
+    .section, .site-footer { width: 98%; }
     .app-badges { flex-direction: column; align-items: center; }
     .app-badge { width: 100%; justify-content: center; }
-    .site-footer { padding: 32px 16px; }
+    .site-footer { padding: 24px 16px; }
   }
 </style>
 </head>
@@ -720,7 +721,7 @@ const landingHTML = `<!DOCTYPE html>
   </section>
 
   <!-- Powered By -->
-  <section class="section section-alt" id="powered-by">
+  <section class="section" id="powered-by">
     <span class="section-label">Data Source</span>
     <h2 class="section-title">Powered By</h2>
     <p class="section-desc">LiveScore MCP is built on top of comprehensive football data.</p>
@@ -752,7 +753,7 @@ const landingHTML = `<!DOCTYPE html>
   </section>
 
   <!-- Usage Policy -->
-  <section class="section section-alt" id="usage-policy">
+  <section class="section" id="usage-policy">
     <span class="section-label">Fair Use</span>
     <h2 class="section-title">Usage Policy</h2>
     <p class="section-desc">LiveScore MCP is free for personal and non-commercial use. Please respect the following guidelines.</p>
@@ -935,12 +936,25 @@ function generateGrid() {
 var lastCols = 0;
 generateGrid();
 
+function clipGrid() {
+  var overlay = document.getElementById('overlay');
+  if (overlay) container.style.maxHeight = overlay.offsetHeight + 'px';
+  container.style.overflow = 'hidden';
+}
+setTimeout(clipGrid, 200);
+setTimeout(clipGrid, 600);
+window.addEventListener('load', function() { clipGrid(); setTimeout(clipGrid, 300); });
+if (window.ResizeObserver) {
+  new ResizeObserver(clipGrid).observe(document.getElementById('overlay'));
+}
+
 var resizeTimer;
 window.addEventListener('resize', function() {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(function() {
     var newCols = Math.floor(window.innerWidth / CELL_UNIT);
     if (newCols !== lastCols) generateGrid();
+    clipGrid();
   }, 300);
 });
 
