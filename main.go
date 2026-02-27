@@ -409,6 +409,17 @@ const landingHTML = `<!DOCTYPE html>
     opacity: 0.4;
   }
 
+  .grid-cell.pulse::after {
+    animation: cellPulse 3s ease-in-out forwards;
+  }
+
+  @keyframes cellPulse {
+    0% { opacity: 1; }
+    35% { opacity: 0.3; }
+    65% { opacity: 0.3; }
+    100% { opacity: 1; }
+  }
+
   /* Content overlay */
   #overlay {
     position: absolute;
@@ -963,6 +974,22 @@ window.addEventListener('load', function() { clipGrid(); setTimeout(clipGrid, 30
 if (window.ResizeObserver) {
   new ResizeObserver(clipGrid).observe(document.getElementById('overlay'));
 }
+
+// Random cell pulse effect
+function pulseRandomCells() {
+  var cells = container.querySelectorAll('.grid-cell:not(.pulse)');
+  if (cells.length === 0) return;
+  var count = 1 + Math.floor(Math.random() * 3);
+  for (var i = 0; i < count && i < cells.length; i++) {
+    var idx = Math.floor(Math.random() * cells.length);
+    var cell = cells[idx];
+    cell.classList.add('pulse');
+    cell.addEventListener('animationend', function() {
+      this.classList.remove('pulse');
+    }, { once: true });
+  }
+}
+setInterval(pulseRandomCells, 2000);
 
 var resizeTimer;
 window.addEventListener('resize', function() {
