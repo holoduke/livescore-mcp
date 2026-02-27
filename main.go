@@ -409,14 +409,20 @@ const landingHTML = `<!DOCTYPE html>
     opacity: 0.4;
   }
 
+  .grid-cell.pulse {
+    filter: brightness(1.4);
+    transform: scale(1.04);
+    z-index: 5;
+  }
+
   .grid-cell.pulse::after {
     animation: cellPulse 3s ease-in-out forwards;
   }
 
   @keyframes cellPulse {
     0% { opacity: 1; }
-    35% { opacity: 0.3; }
-    65% { opacity: 0.3; }
+    30% { opacity: 0; }
+    70% { opacity: 0; }
     100% { opacity: 1; }
   }
 
