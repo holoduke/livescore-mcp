@@ -30,8 +30,8 @@ var priorityLeagues = []string{
 	"EurocupsUEFAChampionsLeague", "EurocupsUEFAEuropaLeague", "EurocupsUEFAEuropaConferenceLeague",
 	"WorldCupWorldCup", "EurocupsEuropeanChampionship", "EurocupsUEFANationsLeagueLeagueA",
 	"EnglandPremierLeague", "SpainPrimeraDivision", "ItalySerieA", "GermanyBundesliga", "FranceLigue1",
-	"NetherlandsEredivisie", "PortugalPrimeiraLiga", "BrazilSerieA", "ArgentinaLigaProfesional",
-	"USAMLS", "SaudiArabiaProLeague", "TurkeySuperLig", "BelgiumProLeague", "ScotlandPremierLeague",
+	"NetherlandsEredivisie", "PortugalPrimeiraLiga", "BrazilSerieA", "ArgentinaPrimeraDivision",
+	"UnitedStatesMLS", "SaudiArabiaProLeague", "TurkeySuperLig", "BelgiumProLeague", "ScotlandPremierLeague",
 	"EnglandChampionship", "MexicoLigaMX",
 }
 

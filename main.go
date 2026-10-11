@@ -26,7 +26,7 @@ const (
 	defaultLang    = "en"
 	defaultVersion = 2800
 	serverName     = "livescore-mcp"
-	serverVersion  = "1.3.0"
+	serverVersion  = "1.3.1"
 )
 
 func main() {
