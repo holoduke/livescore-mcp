@@ -45,6 +45,7 @@ Settings → Connectors → Add custom connector → `https://livescoremcp.com/m
 | `get_league_fixtures` | A competition's latest results, live matches and upcoming fixtures, or one round |
 | `get_standings` | League table: points, goal difference, form, qualification and relegation zones |
 | `get_top_scorers` | Top scorers of a competition |
+| `get_head_to_head` | All-time record of two teams, recent meetings and their next meeting |
 | `get_match` | Match details: events, line-ups, substitutions, statistics, injuries, form, report and head-to-head |
 | `get_team` | Team profile: results, fixtures, squad, injuries, transfers, coach, stadium, honours |
 | `get_player` | Player profile: statistics per season and competition, market value, injuries, transfers |
@@ -53,7 +54,23 @@ Settings → Connectors → Add custom connector → `https://livescoremcp.com/m
 | `get_fixtures` | Alias of `get_league_fixtures` (kept for 1.0 clients) |
 | `health` | Connectivity check |
 
-Answers are compact text written for language models: IDs for follow-up calls and a [football-mania.com](https://football-mania.com) link for every match, team, player and competition. Pass `format: "json"` for the raw data. All tools take a `language` (en, es, de, fr, pt, pt-BR, ar, …) for names and links; all times are UTC. Every tool is read-only.
+Answers are compact text written for language models: IDs for follow-up calls and a [football-mania.com](https://football-mania.com) link for every match, team, player and competition. Every tool is read-only.
+
+- **Names or IDs**: teams, players and competitions can be passed by name (`"Arsenal"`, `"La Liga"`); the best search match is used.
+- **Time zones**: pass `timezone` (IANA, e.g. `Europe/London`) and kick-off times and "today" follow it; the default is UTC.
+- **Languages**: `language` (en, es, de, fr, pt, pt-BR, ar, …) sets team and competition names and the language of the links.
+- **Raw data**: `format: "json"` returns the underlying feed.
+
+## Prompts
+
+Clients that support MCP prompts offer these as ready-made commands:
+
+| Prompt | Arguments |
+|--------|-----------|
+| `match_preview` | `team_a`, `team_b` |
+| `league_roundup` | `league` |
+| `team_report` | `team` |
+| `live_now` | `country` (optional) |
 
 ## Example Queries
 
@@ -66,6 +83,7 @@ Once connected, just ask your AI assistant:
 - "Who scored in the Champions League tonight?"
 - "What matches are on this Saturday in Brazil?"
 - "Tell me about Ajax's squad and injuries"
+- "What's the head-to-head between Real Madrid and Barcelona?"
 
 ## Data Source
 

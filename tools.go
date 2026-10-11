@@ -21,7 +21,7 @@ import (
 const serverInstructions = `Football (soccer) data from football-mania.com: live scores, fixtures and results, standings, top scorers, match details, teams and players for 1000+ competitions.
 
 Workflow: use search to turn a team, player or competition name into its ID or league key, then call the specific tool. get_day_fixtures covers any date; get_live_scores only matches in play right now.
-All dates and kick-off times are UTC; convert to the user's time zone.
+Kick-off times are UTC unless you pass timezone: give the user's IANA time zone (e.g. Europe/London, America/Sao_Paulo) when you know it, so times and \"today\" need no conversion.
 Every answer contains football-mania.com links: cite them when you present the data, so users can open the full match, team or league page.`
 
 // Competitions listed first in day and live overviews; the feed itself is
@@ -59,6 +59,7 @@ func toolError(err error, what string) *mcp.CallToolResult {
 // Shared parameters
 var (
 	langParam   = mcp.WithString("language", mcp.Description("Language for team, competition and country names, and for the football-mania.com links (en, es, de, fr, it, pt, pt-BR, nl, ar, ru, tr, id, …). Default: en"))
+	tzParam     = mcp.WithString("timezone", mcp.Description("IANA time zone for kick-off times and dates, e.g. Europe/London, America/New_York, Asia/Riyadh. Default: UTC"))
 	formatParam = mcp.WithString("format", mcp.Enum("text", "json"), mcp.Description("text (default): compact summary with IDs and links. json: the raw data feed, minified and capped at 60,000 characters"))
 )
 
@@ -78,10 +79,14 @@ func tool(name, title, description string, opts ...mcp.ToolOption) mcp.Tool {
 }
 
 // run wraps a text formatter: argument parsing, raw JSON mode and errors
-func run(what string, fetch func(ctx context.Context, a obj, apiLang string) (any, []byte, error), format func(a obj, lang string, data any) string) server.ToolHandlerFunc {
+func run(what string, fetch func(ctx context.Context, a obj, apiLang string) (any, []byte, error), format func(a obj, v view, data any) string) server.ToolHandlerFunc {
 	return func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		a := args(req.Params.Arguments)
-		lang, apiLang := language(a)
+		v, apiLang, err := newView(a)
+		if err != nil {
+			return mcp.NewToolResultError(err.Error()), nil
+		}
+		a["_view"] = v
 		data, body, err := fetch(ctx, a, apiLang)
 		if err != nil {
 			return toolError(err, what), nil
@@ -89,7 +94,7 @@ func run(what string, fetch func(ctx context.Context, a obj, apiLang string) (an
 		if argStr(a, "format", "text") == "json" {
 			return mcp.NewToolResultText(compactJSON(body)), nil
 		}
-		return mcp.NewToolResultText(format(a, lang, data)), nil
+		return mcp.NewToolResultText(format(a, v, data)), nil
 	}
 }
 
@@ -118,52 +123,57 @@ func registerTools(s *server.MCPServer) {
 		"Football matches being played right now, worldwide, with score and minute, grouped by competition (biggest competitions first). Optional filters by country or league key.",
 		mcp.WithString("country", mcp.Description("Only this country, in English (e.g. England, Spain, Brazil); international club and national-team competitions use Eurocups, International or WorldCup")),
 		mcp.WithString("league_key", mcp.Description("Only this competition (league key from search, e.g. EnglandPremierLeague)")),
-		langParam, formatParam,
+		langParam, tzParam, formatParam,
 	), run("Live scores", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		return fetchJSON(ctx, "fixtures/feed_livenow.json", apiLang, nil)
-	}, func(a obj, lang string, data any) string {
-		return formatDayFeed(a, lang, data, "Live now", 200)
+	}, func(a obj, v view, data any) string {
+		return formatDayFeed(a, v, data, "Live now", 200)
 	}))
 
 	s.AddTool(tool("get_day_fixtures", "Matches on a date",
 		"All football matches on a date: results, live scores and kick-off times, grouped by competition (biggest competitions first). A busy day has 1000+ matches, so filter by country or league_key when you can.",
-		mcp.WithString("date", mcp.Description("YYYY-MM-DD, DD/MM/YYYY, today, tomorrow or yesterday. Default: today (UTC)")),
-		mcp.WithNumber("tzoffset", mcp.Description("Day boundaries in this offset from UTC, in minutes (e.g. 120 for UTC+2). Default: 0")),
+		mcp.WithString("date", mcp.Description("YYYY-MM-DD, DD/MM/YYYY, today, tomorrow or yesterday. Default: today in timezone (UTC if none)")),
+		mcp.WithNumber("tzoffset", mcp.Description("Day boundaries in this offset from UTC, in minutes (e.g. 120 for UTC+2). Default: from timezone, else 0")),
 		mcp.WithString("country", mcp.Description("Only this country, in English (e.g. England, Spain); Eurocups, International or WorldCup for international competitions")),
 		mcp.WithString("league_key", mcp.Description("Only this competition (league key from search)")),
 		mcp.WithNumber("limit", mcp.Description("Maximum matches listed. Default: 150, maximum 500")),
-		langParam, formatParam,
+		langParam, tzParam, formatParam,
 	), run("Fixtures", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
-		date, err := parseDate(argStr(a, "date", ""), time.Now().UTC())
+		v := a["_view"].(view)
+		date, err := parseDate(argStr(a, "date", ""), time.Now().In(v.loc))
 		if err != nil {
 			return nil, nil, err
 		}
 		a["_date"] = date
+		// The day as the user's time zone has it: offset at noon of that date
+		offset := 0
+		if day, err := time.ParseInLocation("02/01/2006 15:04", date+" 12:00", v.loc); err == nil {
+			_, secs := day.Zone()
+			offset = secs / 60
+		}
 		return fetchJSON(ctx, "fixtures/feed_matches_aggregated.json", apiLang, url.Values{
-			"date": {date}, "tzoffset": {fmt.Sprint(argInt(a, "tzoffset", 0))},
+			"date": {date}, "tzoffset": {fmt.Sprint(argInt(a, "tzoffset", offset))},
 		})
-	}, func(a obj, lang string, data any) string {
+	}, func(a obj, v view, data any) string {
 		limit := argInt(a, "limit", 150)
 		if limit < 1 || limit > 500 {
 			limit = 500
 		}
-		return formatDayFeed(a, lang, data, "Matches on "+str(a, "_date"), limit)
+		return formatDayFeed(a, v, data, "Matches on "+str(a, "_date"), limit)
 	}))
 
 	leagueFixtures := run("Competition", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
-		key := strings.TrimSuffix(argStr(a, "league_key", argStr(a, "competition", "")), "_small")
-		if key == "" {
-			return nil, nil, fmt.Errorf("missing required argument \"league_key\"")
-		}
-		a["_key"] = key
-		return emptyIsNotFound(fetchJSON(ctx, "fixtures_v2/"+key+"_small.json", apiLang, nil))
+		raw := strings.TrimSuffix(argStr(a, "league_key", argStr(a, "competition", "")), "_small")
+		return withLeague(ctx, a, apiLang, raw, func(key string) (any, []byte, error) {
+			return emptyIsNotFound(fetchJSON(ctx, "fixtures_v2/"+key+"_small.json", apiLang, nil))
+		})
 	}, formatLeague)
 	s.AddTool(tool("get_league_fixtures", "Competition fixtures and results",
 		"Fixtures and results of one competition (league or cup): latest results, matches in play and upcoming matches of the current season, or one round. For the table use get_standings.",
-		mcp.WithString("league_key", mcp.Required(), mcp.Description("League key from search (e.g. EnglandPremierLeague, SpainPrimeraDivision, EurocupsUEFAChampionsLeague)")),
+		mcp.WithString("league_key", mcp.Required(), mcp.Description("League key from search (e.g. EnglandPremierLeague, SpainPrimeraDivision, EurocupsUEFAChampionsLeague), or the competition name")),
 		mcp.WithString("round", mcp.Description("Only this round/matchday number (e.g. 7)")),
 		mcp.WithNumber("limit", mcp.Description("Results and upcoming matches listed, each. Default: 10")),
-		langParam, formatParam,
+		langParam, tzParam, formatParam,
 	), leagueFixtures)
 	// Kept for clients built against 1.0
 	s.AddTool(tool("get_fixtures", "Competition fixtures (alias)",
@@ -171,41 +181,35 @@ func registerTools(s *server.MCPServer) {
 		mcp.WithString("competition", mcp.Required(), mcp.Description("League key (e.g. EurocupsUEFAChampionsLeague)")),
 		mcp.WithString("round", mcp.Description("Only this round/matchday number")),
 		mcp.WithNumber("limit", mcp.Description("Results and upcoming matches listed, each. Default: 10")),
-		langParam, formatParam,
+		langParam, tzParam, formatParam,
 	), leagueFixtures)
 
 	s.AddTool(tool("get_standings", "League table",
 		"Current standings (league table) of a competition: position, played, won, drawn, lost, goals, points, form and the qualification or relegation zone. Group-stage competitions return every group.",
-		mcp.WithString("league_key", mcp.Required(), mcp.Description("League key from search (e.g. EnglandPremierLeague)")),
+		mcp.WithString("league_key", mcp.Required(), mcp.Description("League key from search (e.g. EnglandPremierLeague), or the competition name")),
 		langParam, formatParam,
 	), run("Standings", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
-		key, err := requireArg(a, "league_key")
-		if err != nil {
-			return nil, nil, err
-		}
-		a["_key"] = key
-		return emptyIsNotFound(fetchJSON(ctx, "tables/"+key+".json", apiLang, nil))
+		return withLeague(ctx, a, apiLang, argStr(a, "league_key", ""), func(key string) (any, []byte, error) {
+			return emptyIsNotFound(fetchJSON(ctx, "tables/"+key+".json", apiLang, nil))
+		})
 	}, formatStandings))
 
 	s.AddTool(tool("get_top_scorers", "Top scorers",
 		"Top scorers of a competition this season: goals, penalty goals, team and nationality.",
-		mcp.WithString("league_key", mcp.Required(), mcp.Description("League key from search (e.g. SpainPrimeraDivision)")),
+		mcp.WithString("league_key", mcp.Required(), mcp.Description("League key from search (e.g. SpainPrimeraDivision), or the competition name")),
 		mcp.WithNumber("limit", mcp.Description("Players listed. Default: 20")),
 		langParam, formatParam,
 	), run("Top scorers", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
-		key, err := requireArg(a, "league_key")
-		if err != nil {
-			return nil, nil, err
-		}
-		a["_key"] = key
-		return emptyIsNotFound(fetchJSON(ctx, "topscorers/"+key+".json", apiLang, nil))
+		return withLeague(ctx, a, apiLang, argStr(a, "league_key", ""), func(key string) (any, []byte, error) {
+			return emptyIsNotFound(fetchJSON(ctx, "topscorers/"+key+".json", apiLang, nil))
+		})
 	}, formatTopScorers))
 
 	s.AddTool(tool("get_match", "Match details",
 		"One match in detail: score, status, goals, cards and substitutions with minutes, line-ups, team statistics (possession, shots, corners…), injuries, form, standings of both teams, match report and head-to-head record.",
 		mcp.WithString("id", mcp.Required(), mcp.Description("Match ID (from fixtures, live scores or search)")),
 		mcp.WithBoolean("h2h", mcp.Description("Include the head-to-head record. Default: true")),
-		langParam, formatParam,
+		langParam, tzParam, formatParam,
 	), run("Match", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		id, err := requireArg(a, "id")
 		if err != nil {
@@ -220,11 +224,14 @@ func registerTools(s *server.MCPServer) {
 
 	s.AddTool(tool("get_team", "Team profile",
 		"A team: recent results and upcoming fixtures, league positions, season statistics, squad with appearances and goals, injuries, transfers, coach, stadium and honours.",
-		mcp.WithString("id", mcp.Required(), mcp.Description("Team ID from search (e.g. 9002 Arsenal, 13183 Ajax)")),
+		mcp.WithString("id", mcp.Required(), mcp.Description("Team ID (e.g. 9002 Arsenal, 13183 Ajax), or the team name (best search match is used)")),
 		mcp.WithBoolean("squad", mcp.Description("Include the full squad. Default: true")),
-		langParam, formatParam,
+		langParam, tzParam, formatParam,
 	), run("Team", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		id, err := requireArg(a, "id")
+		if err == nil {
+			id, err = resolveID(ctx, apiLang, id, "t")
+		}
 		if err != nil {
 			return nil, nil, err
 		}
@@ -233,21 +240,26 @@ func registerTools(s *server.MCPServer) {
 
 	s.AddTool(tool("get_player", "Player profile",
 		"A player: club, position, age, nationality, market value, statistics per season and competition, injuries, transfers and honours.",
-		mcp.WithString("id", mcp.Required(), mcp.Description("Player ID from search or a team squad (e.g. 474972)")),
+		mcp.WithString("id", mcp.Required(), mcp.Description("Player ID (e.g. 474972), or the player name (best search match is used)")),
 		langParam, formatParam,
 	), run("Player", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		id, err := requireArg(a, "id")
+		if err == nil {
+			id, err = resolveID(ctx, apiLang, id, "p")
+		}
 		if err != nil {
 			return nil, nil, err
 		}
 		return fetchJSON(ctx, "players/"+url.PathEscape(id)+".json", apiLang, nil)
 	}, formatPlayer))
 
+	registerH2H(s)
+
 	s.AddTool(tool("search", "Search teams, players, competitions",
 		"Find teams, players and competitions by name and get the IDs and league keys the other tools need. Teams come with their last and next match.",
 		mcp.WithString("q", mcp.Required(), mcp.Description("Name or part of it (e.g. Arsenal, Mbappé, Premier League)")),
 		mcp.WithString("country", mcp.Description("Prefer results from this country (in English)")),
-		langParam, formatParam,
+		langParam, tzParam, formatParam,
 	), run("Search", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		q, err := requireArg(a, "q")
 		if err != nil {
@@ -292,7 +304,7 @@ func registerTools(s *server.MCPServer) {
 
 // --- Day and live feeds: [{country, leagues: [{league, key, matches}]}] ---
 
-func formatDayFeed(a obj, lang string, data any, heading string, limit int) string {
+func formatDayFeed(a obj, v view, data any, heading string, limit int) string {
 	country := strings.ToLower(argStr(a, "country", ""))
 	key := strings.TrimSuffix(argStr(a, "league_key", ""), "_small")
 
@@ -322,7 +334,7 @@ func formatDayFeed(a obj, lang string, data any, heading string, limit int) stri
 	sort.SliceStable(leagues, func(i, j int) bool { return leagueRank(leagues[i].key) < leagueRank(leagues[j].key) })
 
 	var b strings.Builder
-	fmt.Fprintf(&b, "%s: %d matches in %d competitions (times UTC)\n", heading, total, len(leagues))
+	fmt.Fprintf(&b, "%s: %d matches in %d competitions (times %s)\n", heading, total, len(leagues), v.tz)
 	if total == 0 {
 		b.WriteString("No matches")
 		if country != "" || key != "" {
@@ -336,12 +348,12 @@ func formatDayFeed(a obj, lang string, data any, heading string, limit int) stri
 		if shown >= limit {
 			break
 		}
-		fmt.Fprintf(&b, "\n%s (%s) [%s] %s\n", l.name, l.country, l.key, leagueLink(lang, l.key, ""))
+		fmt.Fprintf(&b, "\n%s (%s) [%s] %s\n", l.name, l.country, l.key, leagueLink(v.lang, l.key, ""))
 		for _, m := range l.matches {
 			if shown >= limit {
 				break
 			}
-			b.WriteString("- " + matchLine(lang, m, false) + "\n")
+			b.WriteString("- " + v.matchLine(m, false) + "\n")
 			shown++
 		}
 	}
@@ -353,7 +365,7 @@ func formatDayFeed(a obj, lang string, data any, heading string, limit int) stri
 
 // --- Competition: info, fixtures (whole season), table, topscorers ---
 
-func formatLeague(a obj, lang string, data any) string {
+func formatLeague(a obj, v view, data any) string {
 	d, _ := data.(map[string]any)
 	info := sub(d, "info")
 	key := str(a, "_key")
@@ -375,7 +387,7 @@ func formatLeague(a obj, lang string, data any) string {
 	if w := str(info, "activeWeek"); w != "" {
 		fmt.Fprintf(&b, " · current round %s", w)
 	}
-	fmt.Fprintf(&b, "\n%s\nAll times UTC.\n", leagueLink(lang, key, ""))
+	fmt.Fprintf(&b, "\n%s\nAll times %s.\n", leagueLink(v.lang, key, ""), v.tz)
 	if len(fixtures) == 0 {
 		b.WriteString("\nNo fixtures available for this competition.\n")
 		return b.String()
@@ -386,7 +398,7 @@ func formatLeague(a obj, lang string, data any) string {
 		n := 0
 		for _, m := range fixtures {
 			if str(m, "week") == round {
-				b.WriteString("- " + matchLine(lang, m, true) + "\n")
+				b.WriteString("- " + v.matchLine(m, true) + "\n")
 				n++
 			}
 		}
@@ -418,7 +430,7 @@ func formatLeague(a obj, lang string, data any) string {
 	if len(live) > 0 {
 		b.WriteString("\nLive now:\n")
 		for _, m := range live {
-			b.WriteString("- " + matchLine(lang, m, false) + "\n")
+			b.WriteString("- " + v.matchLine(m, false) + "\n")
 		}
 	}
 	if len(past) > 0 {
@@ -427,7 +439,7 @@ func formatLeague(a obj, lang string, data any) string {
 		}
 		b.WriteString("\nLatest results:\n")
 		for _, m := range past {
-			b.WriteString("- " + roundPrefix(m) + matchLine(lang, m, true) + "\n")
+			b.WriteString("- " + roundPrefix(m) + v.matchLine(m, true) + "\n")
 		}
 	}
 	if len(next) > 0 {
@@ -436,11 +448,11 @@ func formatLeague(a obj, lang string, data any) string {
 		}
 		b.WriteString("\nUpcoming:\n")
 		for _, m := range next {
-			b.WriteString("- " + roundPrefix(m) + matchLine(lang, m, true) + "\n")
+			b.WriteString("- " + roundPrefix(m) + v.matchLine(m, true) + "\n")
 		}
 	}
 	if str(info, "hasTables") == "1" {
-		fmt.Fprintf(&b, "\nStandings: get_standings league_key=%s · %s\n", key, leagueLink(lang, key, "table"))
+		fmt.Fprintf(&b, "\nStandings: get_standings league_key=%s · %s\n", key, leagueLink(v.lang, key, "table"))
 	}
 	return b.String()
 }
@@ -454,7 +466,7 @@ func roundPrefix(m obj) string {
 
 // --- Standings: {season, groups: [{group, teams: [...]}]} ---
 
-func formatStandings(a obj, lang string, data any) string {
+func formatStandings(a obj, v view, data any) string {
 	d, _ := data.(map[string]any)
 	key := str(a, "_key")
 	groups := list(d["groups"])
@@ -463,7 +475,7 @@ func formatStandings(a obj, lang string, data any) string {
 	if s := str(d, "season"); s != "" {
 		fmt.Fprintf(&b, " · season %s", s)
 	}
-	fmt.Fprintf(&b, "\n%s\n", leagueLink(lang, key, "table"))
+	fmt.Fprintf(&b, "\n%s\n", leagueLink(v.lang, key, "table"))
 	if len(groups) == 0 || str(d, "filegroup") == "empty" {
 		b.WriteString("\nNo table for this competition (cups and knockout rounds have none).\n")
 		return b.String()
@@ -496,12 +508,12 @@ func formatStandings(a obj, lang string, data any) string {
 
 // --- Top scorers: {league, tournaments: [{players: [...]}]} ---
 
-func formatTopScorers(a obj, lang string, data any) string {
+func formatTopScorers(a obj, v view, data any) string {
 	d, _ := data.(map[string]any)
 	key := str(a, "_key")
 	limit := argInt(a, "limit", 20)
 	var b strings.Builder
-	fmt.Fprintf(&b, "%s top scorers (%s) [%s]\n%s\n", str(d, "league"), str(d, "country"), key, leagueLink(lang, key, "top-scorers"))
+	fmt.Fprintf(&b, "%s top scorers (%s) [%s]\n%s\n", str(d, "league"), str(d, "country"), key, leagueLink(v.lang, key, "top-scorers"))
 	n := 0
 	for _, t := range list(d["tournaments"]) {
 		players := list(t["players"])
@@ -528,7 +540,7 @@ func formatTopScorers(a obj, lang string, data any) string {
 
 // --- Match ---
 
-func formatMatch(a obj, lang string, data any) string {
+func formatMatch(a obj, v view, data any) string {
 	m, _ := data.(map[string]any)
 	if m == nil || str(m, "id") == "" {
 		return "Match not found. Use get_day_fixtures, get_league_fixtures or search to find the match ID."
@@ -539,8 +551,9 @@ func formatMatch(a obj, lang string, data any) string {
 	if sc == "" {
 		sc = "vs"
 	}
-	fmt.Fprintf(&b, "%s %s %s · %s\n", home, sc, away, statusLabel(m))
-	fmt.Fprintf(&b, "%s · %s %s UTC", str(m, "leaguename"), str(m, "date"), str(m, "time"))
+	fmt.Fprintf(&b, "%s %s %s · %s\n", home, sc, away, v.statusLabel(m))
+	date, clock := v.local(m)
+	fmt.Fprintf(&b, "%s · %s %s %s", str(m, "leaguename"), date, clock, v.tz)
 	if w := str(m, "week"); w != "" {
 		fmt.Fprintf(&b, " · round %s", w)
 	}
@@ -550,7 +563,7 @@ func formatMatch(a obj, lang string, data any) string {
 	if r := str(m, "referee"); r != "" {
 		fmt.Fprintf(&b, " · referee %s", r)
 	}
-	fmt.Fprintf(&b, "\nCompetition key %s · home team %s · away team %s\n%s\n", str(m, "leagueKey"), str(m, "gs_localteamid"), str(m, "gs_visitorteamid"), matchLink(lang, m))
+	fmt.Fprintf(&b, "\nCompetition key %s · home team %s · away team %s\n%s\n", str(m, "leagueKey"), str(m, "gs_localteamid"), str(m, "gs_visitorteamid"), matchLink(v.lang, m))
 	if ht := score(obj{"scoretime": str(m, "ht")}); ht != "" {
 		fmt.Fprintf(&b, "Half-time: %s\n", ht)
 	}
@@ -704,14 +717,14 @@ func eventName(t string) string {
 
 var positionNames = map[string]string{"G": "Goalkeepers", "D": "Defenders", "M": "Midfielders", "A": "Forwards", "F": "Forwards"}
 
-func formatTeam(a obj, lang string, data any) string {
+func formatTeam(a obj, v view, data any) string {
 	t, _ := data.(map[string]any)
 	if t == nil || str(t, "teamname") == "" {
 		return "Team not found. Use search to find the team ID."
 	}
 	id, name := str(t, "id_gs"), str(t, "teamname")
 	var b strings.Builder
-	fmt.Fprintf(&b, "%s (team %s) · %s\n%s\n", name, id, str(t, "country"), teamLink(lang, id, name))
+	fmt.Fprintf(&b, "%s (team %s) · %s\n%s\n", name, id, str(t, "country"), teamLink(v.lang, id, name))
 	var facts []string
 	if f := str(t, "founded"); f != "" {
 		facts = append(facts, "founded "+f)
@@ -769,18 +782,18 @@ func formatTeam(a obj, lang string, data any) string {
 		if len(past) > 6 {
 			past = past[len(past)-6:]
 		}
-		b.WriteString("\nRecent results (UTC):\n")
+		fmt.Fprintf(&b, "\nRecent results (%s):\n", v.tz)
 		for _, m := range past {
-			fmt.Fprintf(&b, "- %s (%s)\n", matchLine(lang, m, true), str(m, "leaguename"))
+			fmt.Fprintf(&b, "- %s (%s)\n", v.matchLine(m, true), str(m, "leaguename"))
 		}
 	}
 	if len(next) > 0 {
 		if len(next) > 6 {
 			next = next[:6]
 		}
-		b.WriteString("\nNext matches (UTC):\n")
+		fmt.Fprintf(&b, "\nNext matches (%s):\n", v.tz)
 		for _, m := range next {
-			fmt.Fprintf(&b, "- %s (%s)\n", matchLine(lang, m, true), str(m, "leaguename"))
+			fmt.Fprintf(&b, "- %s (%s)\n", v.matchLine(m, true), str(m, "leaguename"))
 		}
 	}
 
@@ -864,7 +877,7 @@ func formatTeam(a obj, lang string, data any) string {
 
 // --- Player ---
 
-func formatPlayer(a obj, lang string, data any) string {
+func formatPlayer(a obj, v view, data any) string {
 	p, _ := data.(map[string]any)
 	if p == nil || str(p, "id") == "" {
 		return "Player not found. Use search to find the player ID."
@@ -879,7 +892,7 @@ func formatPlayer(a obj, lang string, data any) string {
 	if (slugName == "" || abbreviatedRe.MatchString(slugName)) && str(p, "firstname") != "" && str(p, "lastname") != "" {
 		slugName = name
 	}
-	fmt.Fprintf(&b, "%s (player %s)\n%s\n", name, id, playerLink(lang, id, slugName))
+	fmt.Fprintf(&b, "%s (player %s)\n%s\n", name, id, playerLink(v.lang, id, slugName))
 	var facts []string
 	for _, f := range [][2]string{{"position", ""}, {"age", "age "}, {"nationality", ""}, {"height", "height "}, {"preferredFoot", "foot "}} {
 		if v := str(p, f[0]); v != "" {
@@ -894,7 +907,7 @@ func formatPlayer(a obj, lang string, data any) string {
 	}
 	b.WriteString(strings.Join(facts, " · ") + "\n")
 	if team := str(p, "team"); team != "" {
-		fmt.Fprintf(&b, "Club: %s (team %s) %s\n", team, str(p, "teamid"), teamLink(lang, str(p, "teamid"), team))
+		fmt.Fprintf(&b, "Club: %s (team %s) %s\n", team, str(p, "teamid"), teamLink(v.lang, str(p, "teamid"), team))
 	}
 	if mv := num(p, "marketvalue"); mv > 0 {
 		fmt.Fprintf(&b, "Market value: €%s\n", humanMoney(mv))
@@ -978,7 +991,7 @@ func humanMoney(v int) string {
 
 // --- Search: {result: [{type: t|p|l, ...}]} ---
 
-func formatSearch(a obj, lang string, data any) string {
+func formatSearch(a obj, v view, data any) string {
 	d, _ := data.(map[string]any)
 	results := list(d["result"])
 	var b strings.Builder
@@ -991,16 +1004,16 @@ func formatSearch(a obj, lang string, data any) string {
 	for _, r := range results {
 		switch str(r, "type") {
 		case "t":
-			line := fmt.Sprintf("- %s (%s) · team %s · %s", str(r, "name"), str(r, "country"), str(r, "id_gs"), teamLink(lang, str(r, "id_gs"), str(r, "name")))
+			line := fmt.Sprintf("- %s (%s) · team %s · %s", str(r, "name"), str(r, "country"), str(r, "id_gs"), teamLink(v.lang, str(r, "id_gs"), str(r, "name")))
 			for _, m := range list(r["matches"]) {
-				line += "\n    " + matchLine(lang, m, true) + " (" + str(m, "leaguename") + ")"
+				line += "\n    " + v.matchLine(m, true) + " (" + str(m, "leaguename") + ")"
 			}
 			teams = append(teams, line)
 		case "p":
 			players = append(players, fmt.Sprintf("- %s (%s) · %s, %s · player %s · %s", str(r, "name"), str(r, "country_player"),
-				str(r, "team_name"), str(r, "league_name"), str(r, "id_gs"), playerLink(lang, str(r, "id_gs"), str(r, "name"))))
+				str(r, "team_name"), str(r, "league_name"), str(r, "id_gs"), playerLink(v.lang, str(r, "id_gs"), str(r, "name"))))
 		case "l":
-			leagues = append(leagues, fmt.Sprintf("- %s (%s) · league_key %s · %s", str(r, "name"), str(r, "country"), str(r, "keygs"), leagueLink(lang, str(r, "keygs"), "")))
+			leagues = append(leagues, fmt.Sprintf("- %s (%s) · league_key %s · %s", str(r, "name"), str(r, "country"), str(r, "keygs"), leagueLink(v.lang, str(r, "keygs"), "")))
 		}
 	}
 	for _, sec := range []struct {

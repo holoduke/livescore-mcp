@@ -3,7 +3,7 @@
   "name": "io.github.holoduke/livescore-mcp",
   "title": "LiveScore MCP",
   "description": "Football live scores, fixtures, standings, top scorers, matches, teams and players for 1000+ leagues",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "websiteUrl": "https://livescoremcp.com",
   "repository": {
     "url": "https://github.com/holoduke/livescore-mcp",

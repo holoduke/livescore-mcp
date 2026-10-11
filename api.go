@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	_ "time/tzdata"
 	"unicode"
 
 	"golang.org/x/text/unicode/norm"
@@ -113,27 +114,35 @@ func fetchJSON(ctx context.Context, path string, lang string, extra url.Values) 
 	}
 	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", u.String(), nil)
+	body, err := cached(u.String(), cacheTTL(path), func() ([]byte, error) {
+		// Detached from the caller: other requests may be waiting on it
+		ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 20*time.Second)
+		defer cancel()
+		req, err := http.NewRequestWithContext(ctx, "GET", u.String(), nil)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Accept", "application/json")
+		req.Header.Set("User-Agent", userAgent())
+		resp, err := httpClient.Do(req)
+		if err != nil {
+			return nil, fmt.Errorf("football data service unreachable: %v", err)
+		}
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("reading response: %v", err)
+		}
+		if resp.StatusCode == http.StatusNotFound {
+			return nil, errNotFound
+		}
+		if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("football data service answered HTTP %d", resp.StatusCode)
+		}
+		return body, nil
+	})
 	if err != nil {
 		return nil, nil, err
-	}
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", userAgent())
-
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("football data service unreachable: %v", err)
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("reading response: %v", err)
-	}
-	if resp.StatusCode == http.StatusNotFound {
-		return nil, nil, errNotFound
-	}
-	if resp.StatusCode != http.StatusOK {
-		return nil, nil, fmt.Errorf("football data service answered HTTP %d", resp.StatusCode)
 	}
 	var data any
 	if err := json.Unmarshal(body, &data); err != nil {
@@ -310,19 +319,53 @@ func score(m obj) string {
 	return s
 }
 
-// statusLabel: "FT", "67'", "HT", "19:00 UTC", "Postponed"…
-func statusLabel(m obj) string {
+// view: how one request wants its answer (language of names and links,
+// time zone of kick-off times)
+type view struct {
+	lang string
+	loc  *time.Location
+	tz   string // label shown with times: "UTC", "Europe/Amsterdam"
+}
+
+func newView(a obj) (view, string, error) {
+	lang, apiLang := language(a)
+	v := view{lang: lang, loc: time.UTC, tz: "UTC"}
+	if tz := argStr(a, "timezone", ""); tz != "" && !strings.EqualFold(tz, "UTC") {
+		loc, err := time.LoadLocation(tz)
+		if err != nil {
+			return v, apiLang, fmt.Errorf("unknown timezone %q; use an IANA name such as Europe/London or America/New_York", tz)
+		}
+		v.loc, v.tz = loc, tz
+	}
+	return v, apiLang, nil
+}
+
+// local: kick-off date and clock in the view's time zone
+func (v view) local(m obj) (date, clock string) {
+	if !clockRe.MatchString(str(m, "time")) {
+		return str(m, "date"), str(m, "time")
+	}
+	t, ok := kickoff(m)
+	if !ok {
+		return str(m, "date"), str(m, "time")
+	}
+	t = t.In(v.loc)
+	return t.Format("02/01/2006"), t.Format("15:04")
+}
+
+// statusLabel: "FT", "LIVE 67'", "LIVE HT", "19:00", "Postp."…
+func (v view) statusLabel(m obj) string {
 	st := str(m, "status")
 	switch {
 	case isLive(st) && st != "HT" && st != "Break":
 		return "LIVE " + st + "'"
-	case st == "HT":
+	case st == "HT" || st == "Break":
 		return "LIVE HT"
 	case isFinished(st) || isOff(st):
 		return st
 	case st == "Not Started" || clockRe.MatchString(st) || st == "":
-		if t := str(m, "time"); t != "" {
-			return t + " UTC"
+		if _, clock := v.local(m); clock != "" {
+			return clock
 		}
 		return "not started"
 	}
@@ -330,7 +373,7 @@ func statusLabel(m obj) string {
 }
 
 // matchLine: "FT · Arsenal 3 - 0 Coventry City · match 3868802 · <link>"
-func matchLine(lang string, m obj, withDate bool) string {
+func (v view) matchLine(m obj, withDate bool) string {
 	middle := " vs "
 	if sc := score(m); sc != "" && str(m, "status") != "Not Started" && !clockRe.MatchString(str(m, "status")) {
 		middle = " " + sc + " "
@@ -339,11 +382,12 @@ func matchLine(lang string, m obj, withDate bool) string {
 	if p := strings.TrimSpace(str(m, "penaltyLocalTeam")); p != "" {
 		extra = fmt.Sprintf(" (pens %s-%s)", p, str(m, "penaltyVisitorTeam"))
 	}
-	when := statusLabel(m)
+	when := v.statusLabel(m)
 	if withDate {
-		when = str(m, "date") + " " + when
+		date, _ := v.local(m)
+		when = date + " " + when
 	}
-	return fmt.Sprintf("%s · %s%s%s%s · match %s · %s", when, str(m, "localteam"), middle, str(m, "visitorteam"), extra, str(m, "id"), matchLink(lang, m))
+	return fmt.Sprintf("%s · %s%s%s%s · match %s · %s", when, str(m, "localteam"), middle, str(m, "visitorteam"), extra, str(m, "id"), matchLink(v.lang, m))
 }
 
 // --- Dates ---
