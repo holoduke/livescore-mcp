@@ -6,48 +6,54 @@ Free [Model Context Protocol](https://modelcontextprotocol.io/) server for real-
 
 ## Quick Start
 
-Connect any MCP client to the SSE endpoint:
+Connect any MCP client to the Streamable HTTP endpoint:
 
 ```
-https://livescoremcp.com/sse
+https://livescoremcp.com/mcp
 ```
 
-### Claude Desktop
+Clients that only support the older SSE transport use `https://livescoremcp.com/sse`. No API key or account needed.
 
-Add to your `claude_desktop_config.json`:
+### Claude Code
+
+```bash
+claude mcp add --transport http livescore https://livescoremcp.com/mcp
+```
+
+### Claude Desktop / claude.ai
+
+Settings → Connectors → Add custom connector → `https://livescoremcp.com/mcp`
+
+### Cursor, Windsurf, VS Code, Cline and others
 
 ```json
 {
   "mcpServers": {
     "livescore": {
-      "url": "https://livescoremcp.com/sse"
+      "url": "https://livescoremcp.com/mcp"
     }
   }
 }
 ```
 
-### Claude Code
-
-```bash
-claude mcp add livescore https://livescoremcp.com/sse
-```
-
-Works with any MCP-compatible client: **Claude Desktop**, **Claude Code**, **Cursor**, **Windsurf**, **Cline**, and more.
-
 ## Available Tools
 
 | Tool | Description |
 |------|-------------|
-| `get_live_scores` | Currently live matches with real-time scores and minute-by-minute updates |
-| `get_fixtures` | Competition fixtures (Champions League, Europa League, World Cup, etc.) |
-| `get_league_fixtures` | League-specific fixtures (e.g. Eredivisie, Premier League) |
-| `get_day_fixtures` | All fixtures for a specific date |
-| `get_match` | Detailed match info with events, lineups, stats, and head-to-head data |
-| `get_team` | Team details including squad and statistics |
-| `get_player` | Player profiles with career stats |
+| `get_live_scores` | Matches in play right now, with score and minute; filter by country or league |
+| `get_day_fixtures` | All matches on a date (results, live, kick-off times); filter by country or league |
+| `get_league_fixtures` | A competition's latest results, live matches and upcoming fixtures, or one round |
+| `get_standings` | League table: points, goal difference, form, qualification and relegation zones |
+| `get_top_scorers` | Top scorers of a competition |
+| `get_match` | Match details: events, line-ups, substitutions, statistics, injuries, form, report and head-to-head |
+| `get_team` | Team profile: results, fixtures, squad, injuries, transfers, coach, stadium, honours |
+| `get_player` | Player profile: statistics per season and competition, market value, injuries, transfers |
+| `search` | Find teams, players and competitions and get the IDs and league keys the other tools use |
 | `get_team_image` | Team logo URL |
-| `search` | Search teams, players, or competitions by name |
+| `get_fixtures` | Alias of `get_league_fixtures` (kept for 1.0 clients) |
 | `health` | Connectivity check |
+
+Answers are compact text written for language models: IDs for follow-up calls and a [football-mania.com](https://football-mania.com) link for every match, team, player and competition. Pass `format: "json"` for the raw data. All tools take a `language` (en, es, de, fr, pt, pt-BR, ar, …) for names and links; all times are UTC. Every tool is read-only.
 
 ## Example Queries
 
@@ -55,10 +61,11 @@ Once connected, just ask your AI assistant:
 
 - "What are the live scores right now?"
 - "Show me the Premier League table"
-- "How is Barcelona doing this week?"
+- "Who are the top scorers in La Liga?"
+- "How did Barcelona do this week, and who do they play next?"
 - "Who scored in the Champions League tonight?"
-- "What matches are on this Saturday?"
-- "Tell me about Ajax's squad"
+- "What matches are on this Saturday in Brazil?"
+- "Tell me about Ajax's squad and injuries"
 
 ## Data Source
 
@@ -72,17 +79,19 @@ Football Mania is also available as a mobile app:
 
 LiveScore MCP is **free for personal and non-commercial use**.
 
-- Rate limits are enforced (30 requests/min per IP)
+- Rate limits are enforced (30 tool calls/min per IP)
 - Bulk scraping and automated data harvesting are not allowed
 - Commercial use requires permission - open an issue to discuss
 
 ## Tech Stack
 
 - **Go** with [mcp-go](https://github.com/mark3labs/mcp-go)
-- **SSE transport** for real-time communication
+- **Streamable HTTP** (`/mcp`, stateless) and **SSE** (`/sse`) transports
 - Deployed on [Coolify](https://coolify.io)
 
 ## Self-Hosting
+
+The football data comes from football-mania.com's own API, which serves the hosted instance at livescoremcp.com; a self-hosted copy is meant for development and testing.
 
 ```bash
 git clone https://github.com/holoduke/livescore-mcp.git

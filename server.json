@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.holoduke/livescore-mcp",
+  "title": "LiveScore MCP",
+  "description": "Football live scores, fixtures, standings, top scorers, matches, teams and players for 1000+ leagues",
+  "version": "1.1.0",
+  "websiteUrl": "https://livescoremcp.com",
+  "repository": {
+    "url": "https://github.com/holoduke/livescore-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://livescoremcp.com/mcp"
+    },
+    {
+      "type": "sse",
+      "url": "https://livescoremcp.com/sse"
+    }
+  ]
+}
