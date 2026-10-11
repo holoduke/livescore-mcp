@@ -26,7 +26,7 @@ const (
 	defaultLang    = "en"
 	defaultVersion = 2800
 	serverName     = "livescore-mcp"
-	serverVersion  = "1.2.0"
+	serverVersion  = "1.3.0"
 )
 
 func main() {
@@ -288,10 +288,10 @@ const landingHTML = `<!DOCTYPE html>
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://livescoremcp.com/">
 <meta property="og:title" content="LiveScore MCP - Football Live Scores for AI Agents">
-<meta property="og:description" content="Free MCP server with 13 tools for real-time football scores, fixtures, standings, head-to-head, team stats and player data. Works with Claude, Cursor and any MCP client.">
+<meta property="og:description" content="Free MCP server with 14 tools for real-time football scores, fixtures, standings, head-to-head, team stats and player data. Works with Claude, Cursor and any MCP client.">
 <meta property="og:image" content="https://livescoremcp.com/static/og-image.png">
-<meta property="og:image:width" content="1024">
-<meta property="og:image:height" content="1024">
+<meta property="og:image:width" content="1408">
+<meta property="og:image:height" content="768">
 <meta property="og:image:alt" content="LiveScore MCP - Football Live Scores API for AI Agents">
 <meta property="og:site_name" content="LiveScore MCP">
 <meta property="og:locale" content="en_US">
@@ -300,7 +300,7 @@ const landingHTML = `<!DOCTYPE html>
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://livescoremcp.com/">
 <meta name="twitter:title" content="LiveScore MCP - Football Live Scores for AI Agents">
-<meta name="twitter:description" content="Free MCP server with 13 tools for real-time football scores, fixtures, standings, head-to-head, team stats and player data. Works with Claude, Cursor and any MCP client.">
+<meta name="twitter:description" content="Free MCP server with 14 tools for real-time football scores, fixtures, standings, head-to-head, team stats and player data. Works with Claude, Cursor and any MCP client.">
 <meta name="twitter:image" content="https://livescoremcp.com/static/og-image.png">
 <meta name="twitter:image:alt" content="LiveScore MCP - Football Live Scores API for AI Agents">
 
@@ -324,7 +324,7 @@ const landingHTML = `<!DOCTYPE html>
     "name": "holoduke",
     "url": "https://github.com/holoduke"
   },
-  "softwareVersion": "1.2.0",
+  "softwareVersion": "1.3.0",
   "datePublished": "2026-02-20",
   "dateModified": "2026-10-11",
   "codeRepository": "https://github.com/holoduke/livescore-mcp",
@@ -362,7 +362,7 @@ const landingHTML = `<!DOCTYPE html>
       "name": "What tools does LiveScore MCP provide?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "LiveScore MCP provides 13 tools: get_live_scores for matches in play, get_day_fixtures for all matches on a date, get_league_fixtures for a competition's results and upcoming matches, get_standings for league tables, get_top_scorers, get_head_to_head for the record between two teams, get_match for full match details with events, line-ups, statistics and head-to-head, get_team and get_player for profiles, search for finding IDs, get_team_image for logos, plus get_fixtures (alias) and a health check. Answers are compact text with football-mania.com links."
+        "text": "LiveScore MCP provides 14 tools: get_live_scores for matches in play, get_day_fixtures for all matches on a date, get_league_fixtures for a competition's results and upcoming matches, get_standings for league tables, get_top_scorers, get_head_to_head for the record between two teams, get_match for full match details with events, line-ups, statistics and head-to-head, get_team and get_player for profiles, search and fetch (ChatGPT-compatible), get_team_image for logos, plus get_fixtures (alias) and a health check. Answers are compact text with football-mania.com links."
       }
     },
     {
@@ -835,7 +835,7 @@ const landingHTML = `<!DOCTYPE html>
   <section class="section" id="tools">
     <span class="section-label">Capabilities</span>
     <h2 class="section-title">Available Football Data Tools</h2>
-    <p class="section-desc">13 tools for real-time football data from 1000+ competitions worldwide, with links to the full pages on football-mania.com.</p>
+    <p class="section-desc">14 tools for real-time football data from 1000+ competitions worldwide, with links to the full pages on football-mania.com.</p>
     <div class="tools-grid">
       <article class="tool-card">
         <span class="tool-icon">&#9889;</span>
@@ -849,8 +849,8 @@ const landingHTML = `<!DOCTYPE html>
       </article>
       <article class="tool-card">
         <span class="tool-icon">&#128269;</span>
-        <h3>search</h3>
-        <p>Search teams, players, or competitions by name with optional country filter</p>
+        <h3>search &amp; fetch</h3>
+        <p>Find teams, players and competitions by name, then fetch full details; the format ChatGPT connectors and deep research expect</p>
       </article>
       <article class="tool-card">
         <span class="tool-icon">&#127942;</span>
@@ -986,7 +986,7 @@ const landingHTML = `<!DOCTYPE html>
   <p>LiveScore MCP is a free Model Context Protocol (MCP) server providing real-time football live scores, fixtures, team statistics, player data, and match details from 1000+ leagues worldwide.</p>
   <p>Connect any MCP-compatible AI client (Claude Desktop, Claude Code, Cursor, Windsurf, Cline) at <code>https://livescoremcp.com/mcp</code> (Streamable HTTP) or <code>https://livescoremcp.com/sse</code> (SSE)</p>
   <h2>Available Tools</h2>
-  <p>get_live_scores, get_day_fixtures, get_league_fixtures, get_fixtures, get_standings, get_top_scorers, get_head_to_head, get_match, get_team, get_player, search, get_team_image, health</p>
+  <p>get_live_scores, get_day_fixtures, get_league_fixtures, get_fixtures, get_standings, get_top_scorers, get_head_to_head, get_match, get_team, get_player, search, fetch, get_team_image, health</p>
   <h2>Links</h2>
   <p><a href="https://github.com/holoduke/livescore-mcp">GitHub Repository</a> | <a href="https://football-mania.com">Powered by football-mania.com</a></p>
 </div>

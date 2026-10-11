@@ -20,7 +20,7 @@ import (
 
 const serverInstructions = `Football (soccer) data from football-mania.com: live scores, fixtures and results, standings, top scorers, match details, teams and players for 1000+ competitions.
 
-Workflow: use search to turn a team, player or competition name into its ID or league key, then call the specific tool. get_day_fixtures covers any date; get_live_scores only matches in play right now.
+Workflow: teams, players and competitions can be passed by name; search returns typed ids (team:…, player:…, league:…) that fetch and every other tool accept. get_day_fixtures covers any date; get_live_scores only matches in play right now.
 Kick-off times are UTC unless you pass timezone: give the user's IANA time zone (e.g. Europe/London, America/Sao_Paulo) when you know it, so times and \"today\" need no conversion.
 Every answer contains football-mania.com links: cite them when you present the data, so users can open the full match, team or league page.`
 
@@ -219,7 +219,7 @@ func registerTools(s *server.MCPServer) {
 		if !argBool(a, "h2h", true) {
 			h2h = "0"
 		}
-		return fetchJSON(ctx, "matches/"+url.PathEscape(id)+".json", apiLang, url.Values{"h2h": {h2h}})
+		return fetchJSON(ctx, "matches/"+url.PathEscape(untyped(id))+".json", apiLang, url.Values{"h2h": {h2h}})
 	}, formatMatch))
 
 	s.AddTool(tool("get_team", "Team profile",
@@ -230,7 +230,7 @@ func registerTools(s *server.MCPServer) {
 	), run("Team", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		id, err := requireArg(a, "id")
 		if err == nil {
-			id, err = resolveID(ctx, apiLang, id, "t")
+			id, err = resolveID(ctx, apiLang, untyped(id), "t")
 		}
 		if err != nil {
 			return nil, nil, err
@@ -245,7 +245,7 @@ func registerTools(s *server.MCPServer) {
 	), run("Player", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		id, err := requireArg(a, "id")
 		if err == nil {
-			id, err = resolveID(ctx, apiLang, id, "p")
+			id, err = resolveID(ctx, apiLang, untyped(id), "p")
 		}
 		if err != nil {
 			return nil, nil, err
@@ -255,22 +255,7 @@ func registerTools(s *server.MCPServer) {
 
 	registerH2H(s)
 
-	s.AddTool(tool("search", "Search teams, players, competitions",
-		"Find teams, players and competitions by name and get the IDs and league keys the other tools need. Teams come with their last and next match.",
-		mcp.WithString("q", mcp.Required(), mcp.Description("Name or part of it (e.g. Arsenal, Mbappé, Premier League)")),
-		mcp.WithString("country", mcp.Description("Prefer results from this country (in English)")),
-		langParam, tzParam, formatParam,
-	), run("Search", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
-		q, err := requireArg(a, "q")
-		if err != nil {
-			return nil, nil, err
-		}
-		extra := url.Values{"q": {q}}
-		if c := argStr(a, "country", ""); c != "" {
-			extra.Set("country", c)
-		}
-		return fetchJSON(ctx, "search_v3", apiLang, extra)
-	}, formatSearch))
+	registerSearchFetch(s)
 
 	s.AddTool(tool("get_team_image", "Team logo",
 		"URL of a team's logo (PNG).",
@@ -987,42 +972,4 @@ func humanMoney(v int) string {
 		return fmt.Sprintf("%dk", v/1000)
 	}
 	return fmt.Sprint(v)
-}
-
-// --- Search: {result: [{type: t|p|l, ...}]} ---
-
-func formatSearch(a obj, v view, data any) string {
-	d, _ := data.(map[string]any)
-	results := list(d["result"])
-	var b strings.Builder
-	fmt.Fprintf(&b, "Search results for %q:\n", argStr(a, "q", ""))
-	if len(results) == 0 {
-		b.WriteString("Nothing found. Try another spelling or a shorter name.\n")
-		return b.String()
-	}
-	var teams, players, leagues []string
-	for _, r := range results {
-		switch str(r, "type") {
-		case "t":
-			line := fmt.Sprintf("- %s (%s) · team %s · %s", str(r, "name"), str(r, "country"), str(r, "id_gs"), teamLink(v.lang, str(r, "id_gs"), str(r, "name")))
-			for _, m := range list(r["matches"]) {
-				line += "\n    " + v.matchLine(m, true) + " (" + str(m, "leaguename") + ")"
-			}
-			teams = append(teams, line)
-		case "p":
-			players = append(players, fmt.Sprintf("- %s (%s) · %s, %s · player %s · %s", str(r, "name"), str(r, "country_player"),
-				str(r, "team_name"), str(r, "league_name"), str(r, "id_gs"), playerLink(v.lang, str(r, "id_gs"), str(r, "name"))))
-		case "l":
-			leagues = append(leagues, fmt.Sprintf("- %s (%s) · league_key %s · %s", str(r, "name"), str(r, "country"), str(r, "keygs"), leagueLink(v.lang, str(r, "keygs"), "")))
-		}
-	}
-	for _, sec := range []struct {
-		title string
-		lines []string
-	}{{"Competitions", leagues}, {"Teams", teams}, {"Players", players}} {
-		if len(sec.lines) > 0 {
-			fmt.Fprintf(&b, "\n%s:\n%s\n", sec.title, strings.Join(sec.lines, "\n"))
-		}
-	}
-	return b.String()
 }

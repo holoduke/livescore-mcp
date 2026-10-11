@@ -24,6 +24,10 @@ claude mcp add --transport http livescore https://livescoremcp.com/mcp
 
 Settings → Connectors → Add custom connector → `https://livescoremcp.com/mcp`
 
+### ChatGPT
+
+Settings → Apps & Connectors → Create (developer mode) → `https://livescoremcp.com/mcp`, no authentication. `search` and `fetch` follow the format ChatGPT connectors and deep research require.
+
 ### Cursor, Windsurf, VS Code, Cline and others
 
 ```json
@@ -49,7 +53,8 @@ Settings → Connectors → Add custom connector → `https://livescoremcp.com/m
 | `get_match` | Match details: events, line-ups, substitutions, statistics, injuries, form, report and head-to-head |
 | `get_team` | Team profile: results, fixtures, squad, injuries, transfers, coach, stadium, honours |
 | `get_player` | Player profile: statistics per season and competition, market value, injuries, transfers |
-| `search` | Find teams, players and competitions and get the IDs and league keys the other tools use |
+| `search` | Find teams, players and competitions; returns typed ids (`team:9002`, `league:EnglandPremierLeague`), titles and links |
+| `fetch` | Full details for an id from search (team, player, competition or match) |
 | `get_team_image` | Team logo URL |
 | `get_fixtures` | Alias of `get_league_fixtures` (kept for 1.0 clients) |
 | `health` | Connectivity check |

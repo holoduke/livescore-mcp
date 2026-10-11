@@ -30,7 +30,7 @@ func handleH2H(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResul
 	for i, key := range []string{"team_a", "team_b"} {
 		raw, err := requireArg(a, key)
 		if err == nil {
-			ids[i], err = resolveID(ctx, apiLang, raw, "t")
+			ids[i], err = resolveID(ctx, apiLang, untyped(raw), "t")
 		}
 		if err != nil {
 			return mcp.NewToolResultError(err.Error()), nil

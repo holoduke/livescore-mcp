@@ -48,6 +48,7 @@ func resolveID(ctx context.Context, apiLang, v, typ string) (string, error) {
 // withLeague fetches by league key; a name ("La Liga"), or a key the API
 // does not know, is looked up with search first
 func withLeague(ctx context.Context, a obj, apiLang, raw string, fetch func(key string) (any, []byte, error)) (any, []byte, error) {
+	raw = untyped(raw)
 	if raw == "" {
 		return nil, nil, fmt.Errorf("missing required argument \"league_key\"")
 	}
