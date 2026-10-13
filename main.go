@@ -92,6 +92,13 @@ func main() {
 		w.Header().Set("Content-Type", "application/xml")
 		fmt.Fprint(w, sitemapXML)
 	})
+	// Glama verifies directory ownership by fetching this path. The repo has
+	// carried glama.json for a while but nothing ever served it, so the
+	// listing could not be claimed.
+	mux.HandleFunc("/.well-known/glama.json", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, glamaJSON)
+	})
 	mux.Handle("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		http.FileServer(http.FS(staticFiles)).ServeHTTP(w, r)
@@ -228,6 +235,11 @@ func clientIP(r *http.Request) string {
 	}
 	return ip
 }
+
+const glamaJSON = `{
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "maintainers": ["holoduke"]
+}`
 
 const robotsTxt = `User-agent: *
 Allow: /
@@ -972,7 +984,7 @@ const landingHTML = `<!DOCTYPE html>
         <a href="/privacy">Privacy Policy</a>
         <a href="/terms">Terms of Service</a>
       </div>
-      <div class="footer-built">Powered by <a href="https://football-mania.com" target="_blank" rel="noopener noreferrer">football-mania.com</a> &bull; Built with <a href="https://github.com/mark3labs/mcp-go" target="_blank" rel="noopener noreferrer">mcp-go</a> &bull; <a href="https://github.com/holoduke/livescore-mcp" target="_blank" rel="noopener noreferrer">Source on GitHub</a></div>
+      <div class="footer-built">Powered by <a href="https://football-mania.com" target="_blank" rel="noopener noreferrer">football-mania.com</a> &bull; By <a href="https://holoduke.nl" target="_blank" rel="noopener noreferrer">Football Mania</a> &bull; Built with <a href="https://github.com/mark3labs/mcp-go" target="_blank" rel="noopener noreferrer">mcp-go</a> &bull; <a href="https://github.com/holoduke/livescore-mcp" target="_blank" rel="noopener noreferrer">Source on GitHub</a></div>
     </div>
   </footer>
 </div>
