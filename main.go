@@ -69,10 +69,16 @@ func main() {
 		server.WithStateLess(true),
 	)
 
-	// Tool calls: 10/min per IP, burst of 10. Handshakes and listings are free.
-	// Burst matches the rate so that "10 per minute" is literally what a caller
-	// can do in a minute, rather than a figure they have to pace themselves to.
-	rl := newRateLimiter(rate.Every(6*time.Second), 10)
+	// Tool calls: 10/min per IP, burst of 30. Handshakes and listings are free.
+	//
+	// The burst is deliberately three times the rate. A single multi-step answer
+	// ("compare these two teams this season") costs ten to fifteen calls, and
+	// cutting one in half is a worse first impression than any throughput it
+	// saves. Sustained use still settles at 10/min, so the ceiling on abuse is
+	// unchanged; the burst only decides whether one question survives intact.
+	// It also buys room for hosted clients (claude.ai, ChatGPT), whose users
+	// all arrive from the platform's egress IPs and so share a bucket.
+	rl := newRateLimiter(rate.Every(6*time.Second), 30)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -354,7 +360,7 @@ const landingHTML = `<!DOCTYPE html>
       "priceCurrency": "USD",
       "availability": "https://schema.org/InStock",
       "url": "https://livescoremcp.com/#usage-policy",
-      "description": "Free: 10 tool calls per minute per IP address, with a burst of 10. Enough for personal projects, research and evaluation. No API key and no sign-up."
+      "description": "Free: 10 tool calls per minute per IP address, with a burst of 30, so a multi-step question completes in one go. Enough for personal projects, research and evaluation. No API key and no sign-up."
     },
     {
       "@type": "Offer",
@@ -425,7 +431,7 @@ const landingHTML = `<!DOCTYPE html>
       "name": "Is LiveScore MCP free to use?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. The public endpoint is free under a fair-use limit of 10 tool calls per minute per IP address, with a burst of 10; connecting and tools/list are not counted. There is no API key, no sign-up and no credit card. Going over the limit returns HTTP 429 with a Retry-After header of a few seconds, rather than a ban. The source code is on GitHub at github.com/holoduke/livescore-mcp. Commercial use, or more throughput than fair use allows, is $100 per month: email gillis.haasnoot@gmail.com."
+        "text": "Yes. The public endpoint is free under a fair-use limit of 10 tool calls per minute per IP address, with a burst of 30; connecting and tools/list are not counted. There is no API key, no sign-up and no credit card. Going over the limit returns HTTP 429 with a Retry-After header of a few seconds, rather than a ban. The source code is on GitHub at github.com/holoduke/livescore-mcp. Commercial use, or more throughput than fair use allows, is $100 per month: email gillis.haasnoot@gmail.com."
       }
     },
     {
@@ -441,7 +447,7 @@ const landingHTML = `<!DOCTYPE html>
       "name": "What are the rate limits of LiveScore MCP?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "10 tool calls per minute per IP address, with a burst of 10. The bucket starts full and refills one call every six seconds, so a question that needs several calls goes through at once. Handshakes, discovery and tools/list are free and never counted against it. Exceeding the limit returns HTTP 429 with a Retry-After header holding the real wait, which is seconds rather than minutes, and nothing is banned. Full MCP access lifts the limit entirely for $100 per month. Contact gillis.haasnoot@gmail.com."
+        "text": "10 tool calls per minute per IP address, with a burst of 30. The bucket starts full and refills one call every six seconds, so a multi-step question that needs ten or fifteen calls still completes in one go. Handshakes, discovery and tools/list are free and never counted against it. Exceeding the limit returns HTTP 429 with a Retry-After header holding the real wait, which is seconds rather than minutes, and nothing is banned. Full MCP access lifts the limit entirely for $100 per month. Contact gillis.haasnoot@gmail.com."
       }
     },
     {
@@ -1093,7 +1099,7 @@ const landingHTML = `<!DOCTYPE html>
         <div class="tier-price">Free</div>
         <p class="tier-for">Personal assistants, side projects, research, trying it out.</p>
         <ul>
-          <li><strong>10 tool calls per minute</strong> per IP address, with a burst of 10</li>
+          <li><strong>10 tool calls per minute</strong> per IP address, with a burst of 30 &mdash; a multi-step question completes in one go</li>
           <li>Connecting, discovery and <code>tools/list</code> are never counted</li>
           <li>All 16 tools, 1,139 competitions, 39 languages</li>
           <li>Over the limit returns <code>429</code> with a <code>Retry-After</code> of a few seconds &mdash; a pause, not a ban</li>
@@ -1522,7 +1528,7 @@ const privacyHTML = `<!DOCTYPE html>
   <p>The landing page uses Google Fonts for typography. Google may collect basic usage data when fonts are loaded. The football data is sourced from <a href="https://football-mania.com" target="_blank" rel="noopener">football-mania.com</a>. No other third-party analytics or tracking services are used.</p>
 
   <h2>Rate Limits &amp; Fair Use</h2>
-  <p>A fair-use limit of 10 tool calls per minute per IP address, with a burst of 10, is enforced. Excessive or automated bulk requests may be throttled or blocked based on IP address. Full MCP access lifts the limit for $100 per month: contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
+  <p>A fair-use limit of 10 tool calls per minute per IP address, with a burst of 30, is enforced. Excessive or automated bulk requests may be throttled or blocked based on IP address. Full MCP access lifts the limit for $100 per month: contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
 
   <h2>Your Rights</h2>
   <p>Since we do not collect personal data beyond standard server logs, there is generally no personal data to access, correct, or delete. If you have concerns about data associated with your IP address, contact us and we will address your request.</p>
@@ -1605,10 +1611,10 @@ const termsHTML = `<!DOCTYPE html>
   </ul>
 
   <h2>4. Rate Limits</h2>
-  <p>The Service enforces a fair-use limit of 10 tool calls per minute per IP address, with a burst of 10; handshakes, discovery and <code>tools/list</code> are not counted. Exceeding it returns HTTP 429 with a <code>Retry-After</code> header giving the actual wait, a matter of seconds. Deliberately circumventing the limit &mdash; rotating addresses, for instance &mdash; may result in temporary or permanent suspension. Full MCP access lifts the limit for $100 per month: contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
+  <p>The Service enforces a fair-use limit of 10 tool calls per minute per IP address, with a burst of 30; handshakes, discovery and <code>tools/list</code> are not counted. Exceeding it returns HTTP 429 with a <code>Retry-After</code> header giving the actual wait, a matter of seconds. Deliberately circumventing the limit &mdash; rotating addresses, for instance &mdash; may result in temporary or permanent suspension. Full MCP access lifts the limit for $100 per month: contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
 
   <h2>5. Commercial Use</h2>
-  <p>The Service is free for personal and non-commercial use within the fair-use limit of 10 tool calls per minute per IP address, with a burst of 10. Commercial use requires a licence. Full MCP access, which lifts that limit and permits use in a commercial product, is $100 per month, billed monthly against a written agreement. A dedicated instance, additional feeds or a volume arrangement are quoted separately. Contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
+  <p>The Service is free for personal and non-commercial use within the fair-use limit of 10 tool calls per minute per IP address, with a burst of 30. Commercial use requires a licence. Full MCP access, which lifts that limit and permits use in a commercial product, is $100 per month, billed monthly against a written agreement. A dedicated instance, additional feeds or a volume arrangement are quoted separately. Contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
 
   <h2>6. Data Accuracy</h2>
   <p>While we strive to provide accurate and timely football data, we make no warranties regarding the accuracy, completeness, or reliability of the data. The data is sourced from third-party providers and may contain errors or delays.</p>
