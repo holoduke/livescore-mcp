@@ -47,6 +47,7 @@ type MatchList struct {
 // StandingsRow is one line of a league table.
 type StandingsRow struct {
 	Position int    `json:"position"`
+	Group    string `json:"group,omitempty" jsonschema_description:"Group or stage name, when the competition has more than one table"`
 	Team     string `json:"team"`
 	TeamID   string `json:"teamId,omitempty" jsonschema_description:"Usable with get_team"`
 	Played   int    `json:"played"`
@@ -55,35 +56,44 @@ type StandingsRow struct {
 	Lost     int    `json:"lost"`
 	GoalsFor int    `json:"goalsFor"`
 	GoalsAg  int    `json:"goalsAgainst"`
+	GoalDiff int    `json:"goalDifference"`
 	Points   int    `json:"points"`
+	Form     string `json:"form,omitempty" jsonschema_description:"Recent results, most recent last, as W/D/L"`
 	Note     string `json:"note,omitempty" jsonschema_description:"Qualification or relegation note, when the feed carries one"`
+	Live     bool   `json:"live,omitempty" jsonschema_description:"true when these points include a match still in play"`
 }
 
 // Standings is the output of get_standings.
 type Standings struct {
 	Competition string         `json:"competition,omitempty"`
 	LeagueKey   string         `json:"leagueKey,omitempty"`
-	Country     string         `json:"country,omitempty"`
+	Country     string         `json:"country,omitempty" jsonschema_description:"Country the competition is filed under, or the confederation for international competitions"`
+	Season      string         `json:"season,omitempty"`
 	Groups      []string       `json:"groups,omitempty" jsonschema_description:"Group names, when the competition has more than one table"`
-	Table       []StandingsRow `json:"table"`
+	Table       []StandingsRow `json:"table" jsonschema_description:"Every group's rows in order; each row names its group when there is more than one"`
+	URL         string         `json:"url,omitempty"`
 }
 
 // Scorer is one row of a top-scorer list.
 type Scorer struct {
-	Rank     int    `json:"rank"`
-	Player   string `json:"player"`
-	PlayerID string `json:"playerId,omitempty" jsonschema_description:"Usable with get_player"`
-	Team     string `json:"team,omitempty"`
-	Goals    int    `json:"goals"`
-	Assists  int    `json:"assists,omitempty"`
-	Penalty  int    `json:"penalties,omitempty"`
+	Rank        int    `json:"rank"`
+	Player      string `json:"player"`
+	PlayerID    string `json:"playerId,omitempty" jsonschema_description:"Usable with get_player"`
+	Team        string `json:"team,omitempty"`
+	TeamID      string `json:"teamId,omitempty" jsonschema_description:"Usable with get_team"`
+	Nationality string `json:"nationality,omitempty"`
+	Goals       int    `json:"goals"`
+	Penalties   int    `json:"penalties,omitempty" jsonschema_description:"Of which scored from the penalty spot"`
+	Tournament  string `json:"tournament,omitempty" jsonschema_description:"Stage name, when the competition splits into more than one"`
 }
 
 // TopScorers is the output of get_top_scorers.
 type TopScorers struct {
 	Competition string   `json:"competition,omitempty"`
 	LeagueKey   string   `json:"leagueKey,omitempty"`
+	Country     string   `json:"country,omitempty"`
 	Scorers     []Scorer `json:"scorers"`
+	URL         string   `json:"url,omitempty"`
 }
 
 // MatchReport is the output of get_match_report.
@@ -227,4 +237,98 @@ func dayLimit(a obj) int {
 		limit = 500
 	}
 	return limit
+}
+
+// structStandings mirrors formatStandings: same group handling, same "no table"
+// case (which yields an empty Table rather than an error), same zone field
+// preference (description_v2 over description).
+func structStandings(a obj, v view, data any) any {
+	d, _ := data.(map[string]any)
+	key := str(a, "_key")
+	out := Standings{
+		Competition: str(d, "leaguename"),
+		LeagueKey:   key,
+		Country:     str(d, "filegroup"),
+		Season:      str(d, "season"),
+		Table:       []StandingsRow{},
+		URL:         leagueLink(v.lang, key, "table"),
+	}
+	groups := list(d["groups"])
+	if str(d, "filegroup") == "empty" {
+		return out
+	}
+	multi := len(groups) > 1
+	for _, g := range groups {
+		name := str(g, "group")
+		if multi {
+			out.Groups = append(out.Groups, name)
+		}
+		for _, t := range list(g["teams"]) {
+			zone := str(t, "description_v2")
+			if zone == "" {
+				zone = str(t, "description")
+			}
+			row := StandingsRow{
+				Position: num(t, "position"),
+				Team:     str(t, "team"),
+				TeamID:   str(t, "id_gs"),
+				Played:   num(t, "totalWon") + num(t, "totalDraw") + num(t, "totalLost"),
+				Won:      num(t, "totalWon"),
+				Drawn:    num(t, "totalDraw"),
+				Lost:     num(t, "totalLost"),
+				GoalsFor: num(t, "totalGoalsFor"),
+				GoalsAg:  num(t, "totalGoalsAgainst"),
+				GoalDiff: num(t, "goalDifference"),
+				Points:   num(t, "points"),
+				Form:     str(t, "recentForm"),
+				Note:     zone,
+				Live:     str(t, "isLive") == "1",
+			}
+			if multi {
+				row.Group = name
+			}
+			out.Table = append(out.Table, row)
+		}
+	}
+	return out
+}
+
+// structTopScorers mirrors formatTopScorers, including the per-tournament limit:
+// the text formatter applies `limit` to each tournament separately, so this does
+// too, or the two views would list different players.
+func structTopScorers(a obj, v view, data any) any {
+	d, _ := data.(map[string]any)
+	key := str(a, "_key")
+	out := TopScorers{
+		Competition: str(d, "league"),
+		LeagueKey:   key,
+		Country:     str(d, "country"),
+		Scorers:     []Scorer{},
+		URL:         leagueLink(v.lang, key, "top-scorers"),
+	}
+	limit := argInt(a, "limit", 20)
+	tours := list(d["tournaments"])
+	for _, t := range tours {
+		name := ""
+		if len(tours) > 1 {
+			name = str(t, "tournament")
+		}
+		for i, p := range list(t["players"]) {
+			if i >= limit {
+				break
+			}
+			out.Scorers = append(out.Scorers, Scorer{
+				Rank:        num(p, "pos"),
+				Player:      str(p, "name"),
+				PlayerID:    str(p, "id"),
+				Team:        str(p, "team"),
+				TeamID:      str(p, "team_id_gs"),
+				Nationality: str(p, "nationality"),
+				Goals:       num(p, "goals"),
+				Penalties:   num(p, "penalty_goals"),
+				Tournament:  name,
+			})
+		}
+	}
+	return out
 }

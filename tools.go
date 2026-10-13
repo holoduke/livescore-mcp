@@ -209,22 +209,24 @@ func registerTools(s *server.MCPServer) {
 		"Current standings (league table) of a competition: position, played, won, drawn, lost, goals, points, form and the qualification or relegation zone. Group-stage competitions return every group.",
 		mcp.WithString("league_key", mcp.Required(), mcp.Description("League key from search (e.g. EnglandPremierLeague), or the competition name")),
 		langParam, formatParam,
+		mcp.WithOutputSchema[Standings](),
 	), run("Standings", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		return withLeague(ctx, a, apiLang, argStr(a, "league_key", ""), func(key string) (any, []byte, error) {
 			return emptyIsNotFound(fetchJSON(ctx, "tables/"+key+".json", apiLang, nil))
 		})
-	}, formatStandings))
+	}, formatStandings, structStandings))
 
 	s.AddTool(tool("get_top_scorers", "Top scorers",
 		"Top scorers of a competition this season: goals, penalty goals, team and nationality.",
 		mcp.WithString("league_key", mcp.Required(), mcp.Description("League key from search (e.g. SpainPrimeraDivision), or the competition name")),
 		mcp.WithNumber("limit", mcp.Description("Players listed. Default: 20")),
 		langParam, formatParam,
+		mcp.WithOutputSchema[TopScorers](),
 	), run("Top scorers", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		return withLeague(ctx, a, apiLang, argStr(a, "league_key", ""), func(key string) (any, []byte, error) {
 			return emptyIsNotFound(fetchJSON(ctx, "topscorers/"+key+".json", apiLang, nil))
 		})
-	}, formatTopScorers))
+	}, formatTopScorers, structTopScorers))
 
 	s.AddTool(tool("get_match", "Match details",
 		"One match in detail: score, status, goals, cards and substitutions with minutes, line-ups, team statistics (possession, shots, corners…), injuries, form, standings of both teams, match report and head-to-head record.",

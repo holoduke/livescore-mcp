@@ -375,7 +375,7 @@ const landingHTML = `<!DOCTYPE html>
       "name": "What tools does LiveScore MCP provide?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "LiveScore MCP provides 16 tools: get_live_scores for matches in play, get_day_fixtures for all matches on a date, get_league_fixtures for a competition's results and upcoming matches, get_standings for league tables, get_top_scorers, get_head_to_head for the record between two teams, get_match for full match details, get_match_report for a written report or preview of a match, get_match_commentary for minute-by-minute commentary and events, get_team and get_player for profiles, search and fetch (ChatGPT-compatible), get_team_image for logos, plus get_fixtures (alias) and a health check. Answers are compact text with football-mania.com links, and the list and report tools also return structured JSON described by an outputSchema."
+        "text": "LiveScore MCP provides 16 tools: get_live_scores for matches in play, get_day_fixtures for all matches on a date, get_league_fixtures for a competition's results and upcoming matches, get_standings for league tables, get_top_scorers, get_head_to_head for the record between two teams, get_match for full match details, get_match_report for a written report or preview of a match, get_match_commentary for minute-by-minute commentary and events, get_team and get_player for profiles, search and fetch (ChatGPT-compatible), get_team_image for logos, plus get_fixtures (alias) and a health check. Answers are compact text with football-mania.com links, and the fixture, table, scorer, report and commentary tools also return structured JSON described by an outputSchema."
       }
     },
     {
@@ -945,7 +945,7 @@ const landingHTML = `<!DOCTYPE html>
       <span class="powered-icon">&#128230;</span>
       <div>
         <h3>Structured output</h3>
-        <p>The fixture, report and commentary tools return typed JSON in <code>structuredContent</code> next to the text, described by each tool&rsquo;s <code>outputSchema</code>. Read fields instead of parsing prose &mdash; or keep using the text, which is unchanged.</p>
+        <p>Six tools &mdash; live scores, day fixtures, standings, top scorers, match report and commentary &mdash; return typed JSON in <code>structuredContent</code> next to the text, described by each tool&rsquo;s <code>outputSchema</code>. Read fields instead of parsing prose &mdash; or keep using the text, which is unchanged.</p>
       </div>
     </div>
   </section>
