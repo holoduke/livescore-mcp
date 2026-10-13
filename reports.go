@@ -22,16 +22,34 @@ import (
 //
 // Both are read-only like every other tool here.
 
-// reportLangs are the languages the generator writes besides English.
+// reportLangs are the languages the generator writes besides English. The
+// codes are the app's own, not ISO, because they are the file suffix the
+// generator produces: see TRANSLATE_LANGS in run_matchnews_generator.js.
 var reportLangs = map[string]bool{
 	"es": true, "de": true, "fr": true, "it": true, "pt": true,
 	"nl": true, "ru": true, "ar": true, "tr": true,
+	"br": true, "hk": true, "th": true, "pl": true,
+	"id": true, "vi": true, "dk": true,
+}
+
+// reportLang gives the suffix to look for, or "" when only English exists.
+// Brazilian Portuguese is the one case where it differs from the language the
+// rest of the API is called with: the generator writes a separate br text, so
+// a pt-BR reader gets the Brazilian wording while names still come back as pt.
+func reportLang(site, api string) string {
+	if site == "pt-BR" {
+		return "br"
+	}
+	if reportLangs[api] {
+		return api
+	}
+	return ""
 }
 
 // fetchLocalised tries <dir>/<id>_<lang>.json and falls back to the English
 // <dir>/<id>.json. Returns the data and the language actually served.
 func fetchLocalised(ctx context.Context, dir, id, lang string) (obj, string, error) {
-	if reportLangs[lang] {
+	if lang != "" {
 		if data, _, err := fetchJSON(ctx, fmt.Sprintf("%s/%s_%s.json", dir, id, lang), lang, nil); err == nil {
 			if d, ok := data.(map[string]any); ok {
 				return d, lang, nil
@@ -69,7 +87,8 @@ func registerReportTools(s *server.MCPServer) {
 		if err != nil {
 			return mcp.NewToolResultError(err.Error()), nil
 		}
-		_, apiLang := language(a)
+		site, apiLang := language(a)
+		wantLang := reportLang(site, apiLang)
 
 		kind := argStr(a, "kind", "auto")
 		order := []string{"matchnews", "matchpreview"}
@@ -81,7 +100,7 @@ func registerReportTools(s *server.MCPServer) {
 		}
 
 		for _, dir := range order {
-			d, servedLang, err := fetchLocalised(ctx, dir, id, apiLang)
+			d, servedLang, err := fetchLocalised(ctx, dir, id, wantLang)
 			if err != nil {
 				continue
 			}
@@ -139,7 +158,7 @@ func registerReportTools(s *server.MCPServer) {
 			if len(out.Sources) > 0 {
 				fmt.Fprintf(&b, "\nSources: %s\n", strings.Join(out.Sources, ", "))
 			}
-			if servedLang != apiLang && reportLangs[apiLang] {
+			if wantLang != "" && servedLang != wantLang {
 				b.WriteString("\n(no translation for this match yet; returned in English)\n")
 			}
 			return mcp.NewToolResultStructured(out, b.String()), nil
