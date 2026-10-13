@@ -291,7 +291,7 @@ const landingHTML = `<!DOCTYPE html>
 <!-- Primary Meta Tags -->
 <title>LiveScore MCP - Football Live Scores API for AI Agents</title>
 <meta name="title" content="LiveScore MCP - Football Live Scores API for AI Agents">
-<meta name="description" content="Free MCP server for real-time football scores, fixtures, team stats and player data. Connect Claude, Cursor or any AI agent to 1000+ leagues worldwide.">
+<meta name="description" content="MCP server for real-time football scores, fixtures, team stats and player data. Connect Claude, Cursor or any AI agent to 1000+ leagues worldwide. Free under fair use; full commercial access $100/month.">
 <meta name="keywords" content="MCP server, football live scores, Model Context Protocol, AI football data, live scores API, soccer API, Claude MCP, football fixtures, league tables, Streamable HTTP">
 <meta name="author" content="holoduke">
 <meta name="robots" content="index, follow">
@@ -301,7 +301,7 @@ const landingHTML = `<!DOCTYPE html>
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://livescoremcp.com/">
 <meta property="og:title" content="LiveScore MCP - Football Live Scores for AI Agents">
-<meta property="og:description" content="Free MCP server with 16 tools for real-time football scores, fixtures, standings, match reports, live commentary, team stats and player data. Works with Claude, Cursor and any MCP client.">
+<meta property="og:description" content="16 tools for real-time football scores, fixtures, standings, match reports, live commentary, team stats and player data. Works with Claude, Cursor and any MCP client. Free under fair use; full commercial access $100/month.">
 <meta property="og:image" content="https://livescoremcp.com/static/og-image.png">
 <meta property="og:image:width" content="1408">
 <meta property="og:image:height" content="768">
@@ -313,7 +313,7 @@ const landingHTML = `<!DOCTYPE html>
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://livescoremcp.com/">
 <meta name="twitter:title" content="LiveScore MCP - Football Live Scores for AI Agents">
-<meta name="twitter:description" content="Free MCP server with 16 tools for real-time football scores, fixtures, standings, match reports, live commentary, team stats and player data. Works with Claude, Cursor and any MCP client.">
+<meta name="twitter:description" content="16 tools for real-time football scores, fixtures, standings, match reports, live commentary, team stats and player data. Works with Claude, Cursor and any MCP client. Free under fair use; full commercial access $100/month.">
 <meta name="twitter:image" content="https://livescoremcp.com/static/og-image.png">
 <meta name="twitter:image:alt" content="LiveScore MCP - Football Live Scores API for AI Agents">
 
@@ -327,19 +327,42 @@ const landingHTML = `<!DOCTYPE html>
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Any",
   "description": "Free MCP server providing real-time football live scores, fixtures, team statistics, player data, and match details via the Model Context Protocol. Supports 1000+ leagues worldwide over Streamable HTTP and SSE.",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  },
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Fair use",
+      "price": "0",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "url": "https://livescoremcp.com/#usage-policy",
+      "description": "Free for personal projects, research, evaluation and open-source work, up to 30 tool calls per minute per IP address. No API key and no sign-up."
+    },
+    {
+      "@type": "Offer",
+      "name": "Full MCP access",
+      "price": "100",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "url": "https://livescoremcp.com/#usage-policy",
+      "description": "Commercial licence with the fair-use rate limit lifted, all 16 tools, all 1,139 competitions and all 39 languages, billed monthly.",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": "100",
+        "priceCurrency": "USD",
+        "unitText": "MONTH",
+        "billingDuration": 1,
+        "billingIncrement": 1
+      }
+    }
+  ],
   "author": {
     "@type": "Organization",
     "name": "holoduke",
     "url": "https://github.com/holoduke"
   },
-  "softwareVersion": "1.3.0",
+  "softwareVersion": "1.5.0",
   "datePublished": "2026-02-20",
-  "dateModified": "2026-10-11",
+  "dateModified": "2026-10-13",
   "codeRepository": "https://github.com/holoduke/livescore-mcp",
   "programmingLanguage": "Go",
   "screenshot": "https://livescoremcp.com/static/og-image.png",
@@ -383,7 +406,23 @@ const landingHTML = `<!DOCTYPE html>
       "name": "Is LiveScore MCP free to use?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, LiveScore MCP is free for personal and non-commercial use. The source code is available on GitHub at github.com/holoduke/livescore-mcp. Rate limits apply. For commercial use or higher rate limits, contact gillis.haasnoot@gmail.com."
+        "text": "Yes. The public endpoint is free under a fair-use limit of 30 tool calls per minute per IP address, with a burst of 20; connecting and tools/list are not counted. There is no API key, no sign-up and no credit card. Going over the limit returns HTTP 429 with Retry-After: 60 rather than a ban. The source code is on GitHub at github.com/holoduke/livescore-mcp. Commercial use, or more throughput than fair use allows, is $100 per month: email gillis.haasnoot@gmail.com."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use LiveScore MCP in a commercial product?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not on the free fair-use tier. Full MCP access for commercial use is $100 per month, which includes a commercial licence to use the data in a product you sell, the fair-use rate limit lifted for your traffic, all 16 tools, all 1,139 competitions and all 39 languages, a written agreement with a monthly invoice, and email support. A dedicated instance, feeds the public server does not expose or a volume deal are quoted separately. Email gillis.haasnoot@gmail.com with what you are building and the request volume you expect."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the rate limits of LiveScore MCP?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "30 tool calls per minute per IP address, with a burst of 20. Handshakes, discovery and tools/list are free and never counted against it. Exceeding the limit returns HTTP 429 with a Retry-After: 60 header, so a busy minute costs you a minute and nothing more. Full MCP access lifts the limit for $100 per month; contact gillis.haasnoot@gmail.com."
       }
     },
     {
@@ -596,6 +635,7 @@ const landingHTML = `<!DOCTYPE html>
   @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } }
 
   /* --- Sections --- */
+  [id] { scroll-margin-top: 76px; }
   .section { max-width: 780px; width: 92%; padding: 40px 28px 48px; margin-top: 20px; pointer-events: auto; background: rgba(0,0,0,0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; }
   .section-label { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #4ade80; background: rgba(74,222,128,0.1); padding: 6px 14px; border-radius: 100px; margin-bottom: 16px; }
   .section-title { font-size: clamp(1.5rem,3vw,2rem); font-weight: 800; color: #f1f5f9; margin-bottom: 12px; letter-spacing: -0.02em; background: linear-gradient(135deg,#f1f5f9 0%,#4ade80 50%,#22d3ee 100%); background-size: 200% 200%; animation: gradientShift 6s ease infinite; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -641,6 +681,32 @@ const landingHTML = `<!DOCTYPE html>
   .policy-card a:hover { text-decoration: underline; }
   .policy-note { margin-top: 24px; padding: 20px 24px; background: rgba(234,179,8,0.06); border: 1px solid rgba(234,179,8,0.15); border-radius: 12px; color: #94a3b8; font-size: 0.85rem; line-height: 1.7; }
   .policy-note strong { color: #eab308; }
+  .pricebar { pointer-events: auto; display: inline-flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 10px 14px; margin-bottom: 22px; padding: 9px 10px 9px 18px; border-radius: 100px; background: rgba(6,8,15,0.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(74,222,128,0.3); box-shadow: 0 6px 30px rgba(0,0,0,0.5); text-decoration: none; }
+  .pricebar:hover { border-color: rgba(74,222,128,0.6); }
+  .pricebar b { color: #4ade80; font-weight: 700; font-size: 0.86rem; letter-spacing: 0.01em; }
+  .pricebar span { color: #cbd5e1; font-size: 0.86rem; }
+  .pricebar span strong { color: #f1f5f9; font-weight: 700; }
+  .pricebar em { font-style: normal; background: #4ade80; color: #04140a; font-weight: 700; font-size: 0.8rem; padding: 6px 14px; border-radius: 100px; white-space: nowrap; }
+  .tier-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 16px; margin-top: 32px; }
+  .tier { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 26px; display: flex; flex-direction: column; }
+  .tier-pro { background: rgba(74,222,128,0.05); border-color: rgba(74,222,128,0.25); }
+  .tier-name { margin: 0; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; }
+  .tier-pro .tier-name { color: #4ade80; }
+  .tier-price { font-size: 1.6rem; font-weight: 800; color: #f1f5f9; margin: 10px 0 4px; letter-spacing: -0.02em; }
+  .tier-for { color: #94a3b8; font-size: 0.85rem; line-height: 1.6; margin-bottom: 18px; }
+  .tier ul { list-style: none; margin: 0 0 20px; padding: 0; }
+  .tier li { color: #cbd5e1; font-size: 0.85rem; line-height: 1.6; padding: 7px 0 7px 24px; position: relative; border-top: 1px solid rgba(255,255,255,0.05); }
+  .tier li:first-child { border-top: 0; }
+  .tier li::before { content: "\2713"; position: absolute; left: 0; top: 7px; color: #4ade80; font-weight: 700; }
+  .tier li code { background: rgba(255,255,255,0.06); border-radius: 5px; padding: 1px 6px; font-size: 0.8rem; color: #e2e8f0; }
+  .tier-cta { margin-top: auto; display: inline-block; text-align: center; padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-decoration: none; background: #4ade80; color: #04140a; transition: filter 0.2s; }
+  .tier-cta:hover { filter: brightness(1.1); }
+  .tier-cta-quiet { background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); }
+  .tier-cta-quiet:hover { background: rgba(255,255,255,0.1); }
+  .tier-price small { font-size: 0.9rem; font-weight: 600; color: #94a3b8; letter-spacing: 0; }
+  .tier-after { margin: 12px 0 0; color: #94a3b8; font-size: 0.78rem; line-height: 1.6; }
+  .tier-after a { color: #4ade80; text-decoration: none; font-weight: 600; }
+  .tier-after a:hover { text-decoration: underline; }
 
   /* --- Footer --- */
   .site-footer { max-width: 780px; width: 92%; border-radius: 16px; padding: 40px 28px; pointer-events: auto; background: rgba(0,0,0,0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.12); margin-bottom: 40px; }
@@ -758,9 +824,15 @@ const landingHTML = `<!DOCTYPE html>
     .code-block { font-size: 11px; padding: 10px 12px; }
     .endpoint { font-size: 11px; }
     .tools-grid { grid-template-columns: 1fr; }
+    [id] { scroll-margin-top: 68px; }
     .section { padding: 32px 20px 40px; }
     .section, .site-footer { width: 96%; }
     .policy-grid { grid-template-columns: 1fr; }
+    .tier-grid { grid-template-columns: 1fr; }
+    .pricebar { padding: 8px 8px 8px 14px; gap: 8px 10px; margin-top: 18px; margin-bottom: 16px; }
+    .pricebar b, .pricebar span { font-size: 0.78rem; }
+    .pricebar em { font-size: 0.74rem; padding: 5px 11px; }
+    .tier { padding: 20px; }
     .policy-note { padding: 16px; }
     .powered-card { flex-direction: column; text-align: center; }
     .footer-inner { flex-direction: column; text-align: center; }
@@ -771,6 +843,7 @@ const landingHTML = `<!DOCTYPE html>
 
   @media (max-width: 480px) {
     #overlay { padding: 24px 8px 30px; }
+    .pricebar { margin-top: 34px; }
     #title { font-size: clamp(32px, 10vw, 56px); -webkit-text-stroke: 2px rgba(0,0,0,0.8); }
     .card { padding: 14px 14px; max-width: 100%; width: 96%; }
     #chat-card { height: 200px; margin-top: 20px; }
@@ -798,13 +871,20 @@ const landingHTML = `<!DOCTYPE html>
   <nav class="header-nav">
     <a href="#tools" class="nav-hide-mobile">Tools</a>
     <a href="#powered-by" class="nav-hide-mobile">Data Source</a>
-    <a href="#get-app">App</a>
+    <a href="#usage-policy">Pricing</a>
+    <a href="#get-app" class="nav-hide-mobile">App</a>
     <a href="https://github.com/holoduke/livescore-mcp" target="_blank" rel="noopener">GitHub</a>
     <a href="#steps-card" class="header-cta">Get Started</a>
   </nav>
 </header>
 
 <div id="overlay">
+  <a class="pricebar" href="#usage-policy">
+    <b>Free for fair use</b>
+    <span>&middot; full MCP access <strong>$100/month</strong></span>
+    <em>See pricing</em>
+  </a>
+
   <h1 id="title">Football<br>Livescore MCP</h1>
 
   <div class="card" id="chat-card" aria-label="Live demo of AI football queries">
@@ -984,28 +1064,45 @@ const landingHTML = `<!DOCTYPE html>
 
   <!-- Usage Policy -->
   <section class="section" id="usage-policy">
-    <span class="section-label">Fair Use</span>
-    <h2 class="section-title">Usage Policy</h2>
-    <p class="section-desc">LiveScore MCP is free for personal and non-commercial use. Please respect the following guidelines.</p>
-    <div class="policy-grid">
-      <div class="policy-card">
-        <span class="policy-icon">&#9889;</span>
-        <h3>Rate Limits Apply</h3>
-        <p>To ensure fair access for everyone, rate limits are enforced. Excessive or automated bulk requests may be throttled or blocked.</p>
+    <span class="section-label">Fair Use &amp; Licensing</span>
+    <h2 class="section-title">Free to use, fairly</h2>
+    <p class="section-desc">The public endpoint is free for personal projects, research, evaluation and open-source work &mdash; no key, no sign-up, no credit card. Putting it in a product you charge for, or need more than fair use allows? Full MCP access is $100 per month.</p>
+
+    <div class="tier-grid">
+      <div class="tier">
+        <h3 class="tier-name">Fair use</h3>
+        <div class="tier-price">Free</div>
+        <p class="tier-for">Personal assistants, side projects, research, trying it out.</p>
+        <ul>
+          <li><strong>30 tool calls per minute</strong> per IP address, with a burst of 20</li>
+          <li>Connecting, discovery and <code>tools/list</code> are never counted</li>
+          <li>All 16 tools, 1,139 competitions, 39 languages</li>
+          <li>Over the limit returns <code>429</code> with <code>Retry-After: 60</code> &mdash; nothing is banned for one busy minute</li>
+          <li>No key to manage and no account to create</li>
+        </ul>
+        <a class="tier-cta tier-cta-quiet" href="#steps-card">Start using it</a>
       </div>
-      <div class="policy-card">
-        <span class="policy-icon">&#128188;</span>
-        <h3>Commercial Use</h3>
-        <p>Using LiveScore MCP data in commercial products, paid services, or for-profit applications requires a commercial license. Contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a> for details.</p>
-      </div>
-      <div class="policy-card">
-        <span class="policy-icon">&#128156;</span>
-        <h3>Be Respectful</h3>
-        <p>Do not abuse the service, scrape data aggressively, or use it in ways that degrade the experience for others. Keep it fair and friendly.</p>
+
+      <div class="tier tier-pro">
+        <h3 class="tier-name">Full MCP access</h3>
+        <div class="tier-price">$100<small>/month</small></div>
+        <p class="tier-for">Paid products, client work, anything at volume, or data you need to rely on.</p>
+        <ul>
+          <li>A <strong>commercial licence</strong> to use the data in a product you sell</li>
+          <li><strong>No fair-use cap</strong> &mdash; the rate limit is lifted for your traffic</li>
+          <li>All 16 tools, all 1,139 competitions, all 39 languages</li>
+          <li>A written agreement and a monthly invoice</li>
+          <li>Support by email, from the person who built it</li>
+        </ul>
+        <a class="tier-cta" href="mailto:gillis.haasnoot@gmail.com?subject=LiveScore%20MCP%20-%20full%20access%20(%24100%2Fmonth)">Get full access</a>
+        <p class="tier-after">Need a dedicated instance, feeds the public server does not expose, or a volume deal? <a href="mailto:gillis.haasnoot@gmail.com?subject=LiveScore%20MCP%20-%20custom%20plan">Ask for a quote</a>.</p>
       </div>
     </div>
+
     <div class="policy-note">
-      <strong>&#9888; Note:</strong> Abuse of the service &mdash; including excessive requests, data scraping, or circumventing rate limits &mdash; may result in your access being permanently revoked. For commercial inquiries or higher rate limits, reach out to <a href="mailto:gillis.haasnoot@gmail.com" style="color:#eab308;text-decoration:none;font-weight:600">gillis.haasnoot@gmail.com</a>.
+      <strong>&#9888; In short:</strong> stay inside the fair-use limit and the service is yours for free. Commercial use, or more throughput than fair use allows, is <strong style="color:#f1f5f9">$100 per month</strong> &mdash; email
+      <a href="mailto:gillis.haasnoot@gmail.com?subject=LiveScore%20MCP%20-%20commercial%20use" style="color:#eab308;text-decoration:none;font-weight:600">gillis.haasnoot@gmail.com</a>
+      and you will get a straight answer. What is not fine either way: scraping the whole dataset, working around the rate limit with rotating addresses, or reselling the feed as your own &mdash; that is what gets access revoked.
     </div>
   </section>
 
@@ -1014,6 +1111,7 @@ const landingHTML = `<!DOCTYPE html>
     <div class="footer-inner">
       <div class="footer-links">
         <a href="https://github.com/holoduke/livescore-mcp">GitHub</a>
+        <a href="/#usage-policy">Fair Use &amp; Pricing</a>
         <a href="/privacy">Privacy Policy</a>
         <a href="/terms">Terms of Service</a>
       </div>
@@ -1405,7 +1503,7 @@ const privacyHTML = `<!DOCTYPE html>
   <p>The landing page uses Google Fonts for typography. Google may collect basic usage data when fonts are loaded. The football data is sourced from <a href="https://football-mania.com" target="_blank" rel="noopener">football-mania.com</a>. No other third-party analytics or tracking services are used.</p>
 
   <h2>Rate Limits &amp; Fair Use</h2>
-  <p>Rate limits are enforced to ensure fair access. Excessive or automated bulk requests may be throttled or blocked based on IP address. For commercial use or higher rate limits, contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
+  <p>A fair-use limit of 30 tool calls per minute per IP address is enforced. Excessive or automated bulk requests may be throttled or blocked based on IP address. Full MCP access lifts the limit for $100 per month: contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
 
   <h2>Your Rights</h2>
   <p>Since we do not collect personal data beyond standard server logs, there is generally no personal data to access, correct, or delete. If you have concerns about data associated with your IP address, contact us and we will address your request.</p>
@@ -1437,7 +1535,7 @@ const termsHTML = `<!DOCTYPE html>
 <title>Terms of Service - LiveScore MCP</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3J7HVJS6ZB"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3J7HVJS6ZB');</script>
-<meta name="description" content="Terms of Service for LiveScore MCP - Free football live scores API for AI agents via the Model Context Protocol.">
+<meta name="description" content="Terms of Service for LiveScore MCP - football live scores for AI agents via the Model Context Protocol. Fair use is free; full commercial access is $100 per month.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://livescoremcp.com/terms">
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
@@ -1488,10 +1586,10 @@ const termsHTML = `<!DOCTYPE html>
   </ul>
 
   <h2>4. Rate Limits</h2>
-  <p>The Service enforces rate limits to ensure fair access for all users. Exceeding these limits may result in temporary or permanent suspension of access. For commercial use or higher rate limits, contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
+  <p>The Service enforces a fair-use limit of 30 tool calls per minute per IP address, with a burst of 20; handshakes, discovery and <code>tools/list</code> are not counted. Exceeding it returns HTTP 429 with a <code>Retry-After: 60</code> header. Deliberately circumventing the limit &mdash; rotating addresses, for instance &mdash; may result in temporary or permanent suspension. Full MCP access lifts the limit for $100 per month: contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
 
   <h2>5. Commercial Use</h2>
-  <p>The Service is free for personal and non-commercial use. Commercial use requires a separate licensing agreement. Please contact us for commercial inquiries.</p>
+  <p>The Service is free for personal and non-commercial use within the fair-use limit of 30 tool calls per minute per IP address. Commercial use requires a licence. Full MCP access, which lifts that limit and permits use in a commercial product, is $100 per month, billed monthly against a written agreement. A dedicated instance, additional feeds or a volume arrangement are quoted separately. Contact <a href="mailto:gillis.haasnoot@gmail.com">gillis.haasnoot@gmail.com</a>.</p>
 
   <h2>6. Data Accuracy</h2>
   <p>While we strive to provide accurate and timely football data, we make no warranties regarding the accuracy, completeness, or reliability of the data. The data is sourced from third-party providers and may contain errors or delays.</p>
