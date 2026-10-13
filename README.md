@@ -57,7 +57,11 @@ Settings → Apps & Connectors → Create (developer mode) → `https://livescor
 | `fetch` | Full details for an id from search (team, player, competition or match) |
 | `get_team_image` | Team logo URL |
 | `get_fixtures` | Alias of `get_league_fixtures` (kept for 1.0 clients) |
+| `get_match_report` | Written report of a finished match, or a preview of one to come, with its sources; translated into nine languages |
+| `get_match_commentary` | Minute-by-minute commentary plus goals, cards and substitutions in order |
 | `health` | Connectivity check |
+
+Tools that return a list or a report also set `structuredContent` alongside the text, described by the tool's `outputSchema`, so a client can read fields instead of parsing prose. The text itself is unchanged.
 
 Answers are compact text written for language models: IDs for follow-up calls and a [football-mania.com](https://football-mania.com) link for every match, team, player and competition. Every tool is read-only.
 

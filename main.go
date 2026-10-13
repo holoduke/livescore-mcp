@@ -26,7 +26,7 @@ const (
 	defaultLang    = "en"
 	defaultVersion = 2800
 	serverName     = "livescore-mcp"
-	serverVersion  = "1.4.0"
+	serverVersion  = "1.5.0"
 )
 
 func main() {
@@ -52,6 +52,7 @@ func main() {
 	)
 
 	registerTools(s)
+	registerReportTools(s)
 	registerResources(s)
 	registerPrompts(s)
 

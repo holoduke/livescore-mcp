@@ -78,8 +78,19 @@ func tool(name, title, description string, opts ...mcp.ToolOption) mcp.Tool {
 	return mcp.NewTool(name, append(all, opts...)...)
 }
 
-// run wraps a text formatter: argument parsing, raw JSON mode and errors
-func run(what string, fetch func(ctx context.Context, a obj, apiLang string) (any, []byte, error), format func(a obj, v view, data any) string) server.ToolHandlerFunc {
+// run wraps a text formatter: argument parsing, raw JSON mode and errors.
+//
+// The optional last argument adds structured output. When present the result
+// carries both the prose (unchanged, in content) and a typed object in
+// structuredContent, so a client can read fields instead of parsing English.
+// Tools that pass one should also declare mcp.WithOutputSchema for the matching
+// type, or clients have no way to know the shape in advance.
+func run(
+	what string,
+	fetch func(ctx context.Context, a obj, apiLang string) (any, []byte, error),
+	format func(a obj, v view, data any) string,
+	structured ...func(a obj, v view, data any) any,
+) server.ToolHandlerFunc {
 	return func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		a := args(req.Params.Arguments)
 		v, apiLang, err := newView(a)
@@ -94,7 +105,11 @@ func run(what string, fetch func(ctx context.Context, a obj, apiLang string) (an
 		if argStr(a, "format", "text") == "json" {
 			return mcp.NewToolResultText(compactJSON(body)), nil
 		}
-		return mcp.NewToolResultText(format(a, v, data)), nil
+		text := format(a, v, data)
+		if len(structured) > 0 && structured[0] != nil {
+			return mcp.NewToolResultStructured(structured[0](a, v, data), text), nil
+		}
+		return mcp.NewToolResultText(text), nil
 	}
 }
 
@@ -124,10 +139,13 @@ func registerTools(s *server.MCPServer) {
 		mcp.WithString("country", mcp.Description("Only this country, in English (e.g. England, Spain, Brazil); international club and national-team competitions use Eurocups, International or WorldCup")),
 		mcp.WithString("league_key", mcp.Description("Only this competition (league key from search, e.g. EnglandPremierLeague)")),
 		langParam, tzParam, formatParam,
+		mcp.WithOutputSchema[MatchList](),
 	), run("Live scores", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		return fetchJSON(ctx, "fixtures/feed_livenow.json", apiLang, nil)
 	}, func(a obj, v view, data any) string {
 		return formatDayFeed(a, v, data, "Live now", 200)
+	}, func(a obj, v view, data any) any {
+		return structDayFeed(a, v, data, 200)
 	}))
 
 	s.AddTool(tool("get_day_fixtures", "Matches on a date",
@@ -138,6 +156,7 @@ func registerTools(s *server.MCPServer) {
 		mcp.WithString("league_key", mcp.Description("Only this competition (league key from search)")),
 		mcp.WithNumber("limit", mcp.Description("Maximum matches listed. Default: 150, maximum 500")),
 		langParam, tzParam, formatParam,
+		mcp.WithOutputSchema[MatchList](),
 	), run("Fixtures", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
 		v := a["_view"].(view)
 		date, err := parseDate(argStr(a, "date", ""), time.Now().In(v.loc))
@@ -160,6 +179,8 @@ func registerTools(s *server.MCPServer) {
 			limit = 500
 		}
 		return formatDayFeed(a, v, data, "Matches on "+str(a, "_date"), limit)
+	}, func(a obj, v view, data any) any {
+		return structDayFeed(a, v, data, dayLimit(a))
 	}))
 
 	leagueFixtures := run("Competition", func(ctx context.Context, a obj, apiLang string) (any, []byte, error) {
