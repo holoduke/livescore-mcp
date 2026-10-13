@@ -301,7 +301,7 @@ const landingHTML = `<!DOCTYPE html>
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://livescoremcp.com/">
 <meta property="og:title" content="LiveScore MCP - Football Live Scores for AI Agents">
-<meta property="og:description" content="Free MCP server with 14 tools for real-time football scores, fixtures, standings, head-to-head, team stats and player data. Works with Claude, Cursor and any MCP client.">
+<meta property="og:description" content="Free MCP server with 16 tools for real-time football scores, fixtures, standings, match reports, live commentary, team stats and player data. Works with Claude, Cursor and any MCP client.">
 <meta property="og:image" content="https://livescoremcp.com/static/og-image.png">
 <meta property="og:image:width" content="1408">
 <meta property="og:image:height" content="768">
@@ -313,7 +313,7 @@ const landingHTML = `<!DOCTYPE html>
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://livescoremcp.com/">
 <meta name="twitter:title" content="LiveScore MCP - Football Live Scores for AI Agents">
-<meta name="twitter:description" content="Free MCP server with 14 tools for real-time football scores, fixtures, standings, head-to-head, team stats and player data. Works with Claude, Cursor and any MCP client.">
+<meta name="twitter:description" content="Free MCP server with 16 tools for real-time football scores, fixtures, standings, match reports, live commentary, team stats and player data. Works with Claude, Cursor and any MCP client.">
 <meta name="twitter:image" content="https://livescoremcp.com/static/og-image.png">
 <meta name="twitter:image:alt" content="LiveScore MCP - Football Live Scores API for AI Agents">
 
@@ -375,7 +375,7 @@ const landingHTML = `<!DOCTYPE html>
       "name": "What tools does LiveScore MCP provide?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "LiveScore MCP provides 14 tools: get_live_scores for matches in play, get_day_fixtures for all matches on a date, get_league_fixtures for a competition's results and upcoming matches, get_standings for league tables, get_top_scorers, get_head_to_head for the record between two teams, get_match for full match details with events, line-ups, statistics and head-to-head, get_team and get_player for profiles, search and fetch (ChatGPT-compatible), get_team_image for logos, plus get_fixtures (alias) and a health check. Answers are compact text with football-mania.com links."
+        "text": "LiveScore MCP provides 16 tools: get_live_scores for matches in play, get_day_fixtures for all matches on a date, get_league_fixtures for a competition's results and upcoming matches, get_standings for league tables, get_top_scorers, get_head_to_head for the record between two teams, get_match for full match details, get_match_report for a written report or preview of a match, get_match_commentary for minute-by-minute commentary and events, get_team and get_player for profiles, search and fetch (ChatGPT-compatible), get_team_image for logos, plus get_fixtures (alias) and a health check. Answers are compact text with football-mania.com links, and the list and report tools also return structured JSON described by an outputSchema."
       }
     },
     {
@@ -848,7 +848,7 @@ const landingHTML = `<!DOCTYPE html>
   <section class="section" id="tools">
     <span class="section-label">Capabilities</span>
     <h2 class="section-title">Available Football Data Tools</h2>
-    <p class="section-desc">14 tools for real-time football data from 1000+ competitions worldwide, with links to the full pages on football-mania.com.</p>
+    <p class="section-desc">16 tools for real-time football data from 1000+ competitions worldwide, with links to the full pages on football-mania.com. The list and report tools also return structured JSON alongside the text.</p>
     <div class="tools-grid">
       <article class="tool-card">
         <span class="tool-icon">&#9889;</span>
@@ -886,6 +886,16 @@ const landingHTML = `<!DOCTYPE html>
         <p>All-time record between two teams, their recent meetings and the next one, by team name or ID</p>
       </article>
       <article class="tool-card">
+        <span class="tool-icon">&#128240;</span>
+        <h3>get_match_report</h3>
+        <p>A written report of a finished match, or a preview of one to come, with the sources it drew on &mdash; translated into nine languages</p>
+      </article>
+      <article class="tool-card">
+        <span class="tool-icon">&#128172;</span>
+        <h3>get_match_commentary</h3>
+        <p>Minute-by-minute written commentary plus goals, cards and substitutions in order, while a match is live or after it</p>
+      </article>
+      <article class="tool-card">
         <span class="tool-icon">&#128101;</span>
         <h3>get_team</h3>
         <p>Detailed team info including squad, statistics, upcoming matches, and recent results</p>
@@ -915,6 +925,28 @@ const landingHTML = `<!DOCTYPE html>
         <h3>health</h3>
         <p>Connectivity check &mdash; echo back a message to verify the MCP server is alive</p>
       </article>
+    </div>
+  </section>
+
+  <!-- Protocol support -->
+  <section class="section" id="protocol">
+    <span class="section-label">Compatibility</span>
+    <h2 class="section-title">Speaks every version of MCP</h2>
+    <p class="section-desc">Including <strong>2026-07-28</strong>, the specification that replaced the initialize handshake with <code>server/discover</code>. Older clients keep working unchanged.</p>
+    <div class="powered-card">
+      <span class="powered-icon">&#128279;</span>
+      <div>
+        <h3>Supported protocol versions</h3>
+        <p><code>2026-07-28</code> &middot; <code>2025-11-25</code> &middot; <code>2025-06-18</code> &middot; <code>2025-03-26</code> &middot; <code>2024-11-05</code></p>
+        <p>Streamable HTTP at <code>/mcp</code> and SSE at <code>/sse</code>. Stateless, so it scales horizontally and needs no session affinity.</p>
+      </div>
+    </div>
+    <div class="powered-card">
+      <span class="powered-icon">&#128230;</span>
+      <div>
+        <h3>Structured output</h3>
+        <p>The fixture, report and commentary tools return typed JSON in <code>structuredContent</code> next to the text, described by each tool&rsquo;s <code>outputSchema</code>. Read fields instead of parsing prose &mdash; or keep using the text, which is unchanged.</p>
+      </div>
     </div>
   </section>
 
@@ -999,7 +1031,7 @@ const landingHTML = `<!DOCTYPE html>
   <p>LiveScore MCP is a free Model Context Protocol (MCP) server providing real-time football live scores, fixtures, team statistics, player data, and match details from 1000+ leagues worldwide.</p>
   <p>Connect any MCP-compatible AI client (Claude Desktop, Claude Code, Cursor, Windsurf, Cline) at <code>https://livescoremcp.com/mcp</code> (Streamable HTTP) or <code>https://livescoremcp.com/sse</code> (SSE)</p>
   <h2>Available Tools</h2>
-  <p>get_live_scores, get_day_fixtures, get_league_fixtures, get_fixtures, get_standings, get_top_scorers, get_head_to_head, get_match, get_team, get_player, search, fetch, get_team_image, health</p>
+  <p>get_live_scores, get_day_fixtures, get_league_fixtures, get_fixtures, get_standings, get_top_scorers, get_head_to_head, get_match, get_match_report, get_match_commentary, get_team, get_player, search, fetch, get_team_image, health</p>
   <h2>Links</h2>
   <p><a href="https://github.com/holoduke/livescore-mcp">GitHub Repository</a> | <a href="https://football-mania.com">Powered by football-mania.com</a></p>
 </div>
